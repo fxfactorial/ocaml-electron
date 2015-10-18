@@ -1,0 +1,4 @@
+OCaml bindings for electron
+These are OCaml bindings to electron Build electron based application
+with the type safety of OCaml
+
