@@ -17,5 +17,7 @@ Description:
 Library electron
   Path:         src
   Modules:      Electron
+  InternalModules:
+    App, Browser_window
   CompiledObject: byte
   BuildDepends: nodejs
