@@ -1,6 +1,5 @@
 let () =
   let app = Electron.App.require () in
-  (* let b = Electron.Browser_window.require () in *)
   let main_window = ref Js.null in
   app##on
     (Js.string "window-all-closed")
@@ -12,19 +11,18 @@ let () =
     (Js.string "ready")
     (Js.wrap_callback begin fun () ->
 
-        main_window := Js.Opt.return (
-            (* Hack but useful, not sure how to bind this object yet *)
-            Js.Unsafe.eval_string
-              "(function(){var brow = require(\"browser-window\");\
-               return new brow({width:800, height:600});})()");
+        main_window :=
+          Js.Opt.return (Electron.Browser_window.make 800 600);
 
         let main_window_now =
           Js.Opt.get !main_window (fun () -> assert false)
         in
 
         main_window_now##loadUrl
-          (Js.string "file:///Users/Edgar/Repos/\
-                      ocaml-electron/examples/index.html");
+          (Js.string
+             (Printf.sprintf
+                "file://%s/index.html" (Nodejs_globals.__dirname ())));
+
         main_window_now##openDevTools ();
 
         main_window_now##on
