@@ -1,0 +1,67 @@
+These are `js_of_ocaml` bindings to [Electron](https://github.com/atom/electron). This is a great way to
+write cross platform `OCaml` GUI programs!
+
+# Example
+
+Here's a working example of a electron program:
+![img](./electron_working.gif)
+
+The Source code for this program is:
+
+```ocaml
+let () =
+  let app = Electron.App.require () in
+  let main_window = ref Js.null in
+  app##on
+    (Js.string "window-all-closed")
+    (Js.wrap_callback begin fun () ->
+        if (Js.to_string Nodejs.Process.process##.platform) <> "darwin"
+           then app##quit ()
+      end);
+  app##on
+    (Js.string "ready")
+    (Js.wrap_callback begin fun () ->
+
+        main_window :=
+          Js.Opt.return (Electron.Browser_window.make 800 600);
+
+        let main_window_now =
+          Js.Opt.get !main_window (fun () -> assert false)
+        in
+
+        main_window_now##loadUrl
+          (Js.string
+             (Printf.sprintf
+                "file://%s/index.html" (Nodejs_globals.__dirname ())));
+
+        main_window_now##openDevTools ();
+
+        main_window_now##on
+          (Js.string "closed")
+          (Js.wrap_callback begin fun () ->
+              main_window := Js.null
+          end)
+
+      end)
+```
+
+To make this code work you'll need to have/do
+
+1.  `opam` : This is OCaml's package manager.
+2.  `js_of_ocaml` : `opam install js_of_ocaml`
+3.  `ocaml-nodejs` : 
+    
+    ```shell
+    $ git clone https://github.com/fxfactorial/ocaml-nodejs
+    $ cd ocaml-nodejs
+    $ opam pin add nodejs . -y
+    ```
+4.  `electron` : `npm install electron-prebuilt -g`
+5.  These electron bindings : 
+    
+    ```shell
+    $ git clone https://github.com/fxfactorial/ocaml-electron
+    $ cd ocaml-electron
+    $ opam pin add electron . -y
+    ```
+6.  Go to the `examples` directory, type `make`
