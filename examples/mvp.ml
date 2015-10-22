@@ -12,7 +12,8 @@ let () =
     (Js.wrap_callback begin fun () ->
 
         main_window :=
-          Js.Opt.return (Electron.Browser_window.make 800 600);
+          Js.Opt.return (new%js Electron.Browser_window.browser_window
+                          (object%js val height = 800 val width = 600 end));
 
         let main_window_now =
           Js.Opt.get !main_window (fun () -> assert false)

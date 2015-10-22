@@ -9,11 +9,10 @@ class type browser_window = object
     unit Js.meth
 end
 
-(* Hack but useful, not sure how to bind this object yet *)
-let make width height : browser_window Js.t =
-  Js.Unsafe.eval_string
-    (Printf.sprintf "(function(){var brow = require(\"browser-window\");\
-                     return new brow({width:%d, height:%d});})()" width height)
+let browser_window : (<height: int Js.readonly_prop;
+                       width: int Js.readonly_prop> Js.t ->
+                      browser_window Js.t) Js.constr =
+  Js.Unsafe.js_expr "require(\"browser-window\")"
 
 let require () : browser_window Js.t =
   Nodejs_globals.require "browser-window"
