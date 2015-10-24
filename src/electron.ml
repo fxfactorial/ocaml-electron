@@ -2,6 +2,10 @@ module App = struct
   include App
 end
 
+module Web_contents = struct
+  include Web_contents
+end
+
 module Browser_window = struct
   include Browser_window
 end
@@ -28,4 +32,8 @@ end
 
 module Remote = struct
   include Remote
+end
+
+module Tray = struct
+  include Tray
 end

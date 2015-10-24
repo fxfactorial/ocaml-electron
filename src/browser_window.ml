@@ -1,12 +1,16 @@
-
 class type browser_window = object
 
   method loadUrl : Js.js_string Js.t -> unit Js.meth
+
   method openDevTools : unit -> unit Js.meth
+
+  method webContents : Web_contents.web_contents Js.t Js.readonly_prop
+
   method on :
     Js.js_string Js.t ->
     (unit -> unit) Js.callback ->
     unit Js.meth
+
 end
 
 let browser_window : (<height: int Js.readonly_prop;
