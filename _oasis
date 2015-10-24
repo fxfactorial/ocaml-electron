@@ -18,6 +18,7 @@ Library electron
   Path:         src
   Modules:      Electron
   InternalModules:
-    App, Browser_window, Screen, Dialog
+    App, Browser_window, Screen, Dialog, Clipboard,
+    Shortcut
   CompiledObject: byte
   BuildDepends: nodejs

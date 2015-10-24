@@ -1,6 +1,9 @@
 class type dialog = object
 
-  method showOpenDialog : unit -> unit Js.meth
+  (* Not correct *)
+  method showOpenDialog : unit -> 'a Js.js_array Js.meth
+
+  method showErrorBox : Js.js_string Js.t -> Js.js_string Js.t -> unit Js.meth
 
 end
 

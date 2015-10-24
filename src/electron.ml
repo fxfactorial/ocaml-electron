@@ -13,3 +13,11 @@ end
 module Dialog = struct
   include Dialog
 end
+
+module Clipboard = struct
+  include Clipboard
+end
+
+module Shortcut = struct
+  include Shortcut
+end
