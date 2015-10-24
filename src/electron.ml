@@ -21,3 +21,11 @@ end
 module Shortcut = struct
   include Shortcut
 end
+
+module Menu = struct
+  include Menu
+end
+
+module Remote = struct
+  include Remote
+end
