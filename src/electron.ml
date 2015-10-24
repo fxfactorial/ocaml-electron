@@ -6,3 +6,10 @@ module Browser_window = struct
   include Browser_window
 end
 
+module Screen = struct
+  include Screen
+end
+
+module Dialog = struct
+  include Dialog
+end

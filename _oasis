@@ -18,6 +18,6 @@ Library electron
   Path:         src
   Modules:      Electron
   InternalModules:
-    App, Browser_window
+    App, Browser_window, Screen, Dialog
   CompiledObject: byte
   BuildDepends: nodejs
