@@ -21,6 +21,5 @@ exhaust_api.js
 .tern-port
 chat_server.js
 examples/node_modules
-package.json
 examples/basic.js
 examples/mvp.js
