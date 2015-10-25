@@ -41,3 +41,7 @@ end
 module Power_monitor = struct
   include Power_monitor
 end
+
+module Ipc = struct
+  include Ipc
+end
