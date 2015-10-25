@@ -2,10 +2,6 @@ module App = struct
   include App
 end
 
-module Web_contents = struct
-  include Web_contents
-end
-
 module Browser_window = struct
   include Browser_window
 end
