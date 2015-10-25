@@ -8,4 +8,4 @@ class type dialog = object
 end
 
 let require () : dialog Js.t =
-  Nodejs_globals.require "dialog"
+  Nodejs_kit.require "dialog"

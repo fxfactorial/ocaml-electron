@@ -19,4 +19,4 @@ class type clipboard = object
 end
 
 let require () : clipboard Js.t =
-  Nodejs_globals.require "dialog"
+  Nodejs_kit.require "dialog"

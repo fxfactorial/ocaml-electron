@@ -226,11 +226,16 @@ class type browser_window = object
       width and height are within the content view--only that they
       exist. Just sum any extra width and height areas you have within
       the overall content view. *)
-  method setAspectRatio : float -> <width : int; height : int> Js.t -> unit Js.meth
+  method setAspectRatio :
+    float -> <width : int; height : int> Js.t -> unit Js.meth
 
-  method setBounds : <width : int; height : int; x : int; y : int> Js.t -> unit Js.meth
+  method setBounds :
+    <width : int; height : int; x : int; y : int> Js.t ->
+    unit Js.meth
 
-  method getBounds : unit -> <width : int; height : int; x : int; y : int> Js.t Js.meth
+  method getBounds :
+    unit ->
+    <width : int; height : int; x : int; y : int> Js.t Js.meth
 
   method setSize : int -> int -> unit Js.meth
 
@@ -284,4 +289,4 @@ let browser_window : (<height: int Js.readonly_prop;
   Js.Unsafe.js_expr "require(\"browser-window\")"
 
 let require () : browser_window Js.t =
-  Nodejs_globals.require "browser-window"
+  Nodejs_kit.require "browser-window"

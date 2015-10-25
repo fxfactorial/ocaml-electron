@@ -21,4 +21,4 @@ class type crash_reporter = object
 end
 
 let require () : crash_reporter Js.t =
-  Nodejs_globals.require "crash-reporter"
+  Nodejs_kit.require "crash-reporter"

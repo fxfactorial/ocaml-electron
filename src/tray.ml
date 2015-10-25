@@ -37,4 +37,4 @@ let tray : (Image.image -> tray Js.t) Js.constr =
   Js.Unsafe.js_expr "require(\"tray\")"
 
 let require () : tray Js.t =
-  Nodejs_globals.require "tray"
+  Nodejs_kit.require "tray"

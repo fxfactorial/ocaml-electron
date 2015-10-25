@@ -62,4 +62,4 @@ end
 
 
 let require () : shortcut Js.t =
-  Nodejs_globals.require "global-shortcut"
+  Nodejs_kit.require "global-shortcut"

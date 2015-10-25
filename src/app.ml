@@ -12,4 +12,4 @@ class type app = object
 end
 
 let require () : app Js.t =
-  Nodejs_globals.require "app"
+  Nodejs_kit.require "app"

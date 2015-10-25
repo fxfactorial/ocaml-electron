@@ -19,4 +19,4 @@ class type screen = object
 end
 
 let require () : screen Js.t =
-  Nodejs_globals.require "screen"
+  Nodejs_kit.require "screen"

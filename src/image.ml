@@ -17,4 +17,4 @@ class type native_image = object
 end
 
 let require () : native_image Js.t =
-  Nodejs_globals.require "native-image"
+  Nodejs_kit.require "native-image"

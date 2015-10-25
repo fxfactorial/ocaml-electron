@@ -19,4 +19,4 @@ class type ipc = object
 end
 
 let require () : ipc Js.t =
-  Nodejs_globals.require "ipc"
+  Nodejs_kit.require "ipc"

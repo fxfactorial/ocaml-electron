@@ -23,4 +23,4 @@ class type power_monitor = object
 end
 
 let require () : power_monitor Js.t =
-  Nodejs_globals.require "power-monitor"
+  Nodejs_kit.require "power-monitor"

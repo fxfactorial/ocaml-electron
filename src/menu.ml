@@ -44,4 +44,4 @@ let menu_item :
   Js.Unsafe.js_expr "require(\"menu-item\")"
 
 let require () : menu Js.t =
-  Nodejs_globals.require "menu"
+  Nodejs_kit.require "menu"
