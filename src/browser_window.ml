@@ -158,6 +158,124 @@ class type browser_window = object
     (unit -> unit) Js.callback ->
     unit Js.meth
 
+  (** Force closing the window, the unload and beforeunload event
+      won't be emitted for the web page, and close event will also not be
+      emitted for this window, but it guarantees the closed event will be
+      emitted.
+
+      You should only use this method when the renderer process (web
+      page) has crashed.*)
+  method destroy : unit -> unit Js.meth
+
+  (** Try to close the window, this has the same effect with user
+      manually clicking the close button of the window. The web page may
+      cancel the close though, see the close event.*)
+  method close : unit -> unit Js.meth
+
+  (** Focus on the window. *)
+  method focus : unit -> unit Js.meth
+
+  method isFocused : unit -> bool Js.meth
+
+  (** Shows and gives focus to the window. *)
+  method show : unit -> unit Js.meth
+
+  (** Shows the window but doesn't focus on it. *)
+  method showInactive : unit -> unit Js.meth
+
+  (** Hide the window. *)
+  method hide : unit -> unit Js.meth
+
+  (** Whether the window is visible to the user. *)
+  method isVisible : unit -> bool Js.meth
+
+  (** Focus on the window. *)
+  method maximize : unit -> unit Js.meth
+
+  (** Focus on the window. *)
+  method unmaximize : unit -> unit Js.meth
+
+  (** Focus on the window. *)
+  method isMaximized : unit -> bool Js.meth
+
+  (** Minimizes the window. On some platforms the minimized window
+      will be shown in the Dock. *)
+  method minimize : unit -> unit Js.meth
+
+  (** Restores the window from minimized state to its previous state. *)
+  method restore : unit -> unit Js.meth
+
+  method isMinimized : unit -> bool Js.meth
+
+  (** Sets whether the window should be in fullscreen mode. *)
+  method setFullScreen : bool -> unit Js.meth
+
+  (** OS X Only : This will have a window maintain an aspect
+      ratio. The extra size allows a developer to have space,
+      specified in pixels, not included within the aspect ratio
+      calculations. This API already takes into account the difference
+      between a window's size and its content size.
+
+      Consider a normal window with an HD video player and associated
+      controls. Perhaps there are 15 pixels of controls on the left
+      edge, 25 pixels of controls on the right edge and 50 pixels of
+      controls below the player. In order to maintain a 16:9 aspect
+      ratio (standard aspect ratio for HD @1920x1080) within the
+      player itself we would call this function with arguments of 16/9
+      and [ 40, 50 ]. The second argument doesn't care where the extra
+      width and height are within the content view--only that they
+      exist. Just sum any extra width and height areas you have within
+      the overall content view. *)
+  method setAspectRatio : float -> <width : int; height : int> Js.t -> unit Js.meth
+
+  method setBounds : <width : int; height : int; x : int; y : int> Js.t -> unit Js.meth
+
+  method getBounds : unit -> <width : int; height : int; x : int; y : int> Js.t Js.meth
+
+  method setSize : int -> int -> unit Js.meth
+
+  method getSize : unit -> int Js.js_array Js.meth
+
+  method setContentSize : int -> int -> unit Js.meth
+
+  method getContentSize : unit -> int Js.js_array Js.meth
+
+  method setMinimumSize : int -> int -> unit Js.meth
+
+  method getMinimumSize : unit -> int Js.js_array Js.meth
+
+  method setMaximumSize : int -> int -> unit Js.meth
+
+  method getMaximumSize : unit -> int Js.js_array Js.meth
+
+  method setResizable : bool -> unit Js.meth
+
+  method isResizable : unit -> bool Js.meth
+
+  (** Sets whether the window should show always on top of other
+      windows. After setting this, the window is still a normal window,
+      not a toolbox window which can not be focused on. *)
+  method setAlwaysOnTop : bool -> unit Js.meth
+
+  method isAlwaysOnTop : unit -> bool Js.meth
+
+  (** Moves window to the center of the screen. *)
+  method center : unit -> unit Js.meth
+
+  method setPosition : int -> int -> unit Js.meth
+
+  method getPosition : unit -> int Js.js_array Js.meth
+
+  method setTitle : Js.js_string Js.t -> unit Js.meth
+
+  method getTitle : unit -> Js.js_string Js.t Js.meth
+
+  (** Starts or stops flashing the window to attract user's attention. *)
+  method flashFrame : unit -> unit Js.meth
+
+  (** Makes the window not show in the taskbar. *)
+  method setSkipTaskbar : bool -> unit Js.meth
+
 end
 
 let browser_window : (<height: int Js.readonly_prop;
