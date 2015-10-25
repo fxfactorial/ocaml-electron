@@ -37,3 +37,7 @@ end
 module Tray = struct
   include Tray
 end
+
+module Crash_reporter = struct
+  include Crash_reporter
+end
