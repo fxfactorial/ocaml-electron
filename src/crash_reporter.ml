@@ -1,4 +1,4 @@
-class type class_reporter = object
+class type crash_reporter = object
 
   (** You are required to call this method before using other
       crashReporter APIs. *)
@@ -20,5 +20,5 @@ class type class_reporter = object
 
 end
 
-let require () : class_reporter Js.t =
+let require () : crash_reporter Js.t =
   Nodejs_globals.require "crash-reporter"

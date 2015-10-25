@@ -19,6 +19,7 @@ Library electron
   Modules:      Electron
   InternalModules:
     App, Browser_window, Screen, Dialog, Clipboard,
-    Shortcut, Menu, Remote, Web_contents, Tray, Power_monitor
+    Shortcut, Menu, Remote, Web_contents, Tray, Crash_reporter,
+    Power_monitor
   CompiledObject: byte
   BuildDepends: nodejs

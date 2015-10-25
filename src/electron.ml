@@ -41,3 +41,7 @@ end
 module Crash_reporter = struct
   include Crash_reporter
 end
+
+module Power_monitor = struct
+  include Power_monitor
+end
