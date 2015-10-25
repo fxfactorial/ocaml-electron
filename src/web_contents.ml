@@ -6,6 +6,8 @@ class type web_contents = object
     (unit -> unit) Js.callback ->
     unit Js.meth
 
+  method getUrl : unit -> Js.js_string Js.t Js.meth
+
   (* method toString : unit -> Js.js_string Js.t Js.meth *)
 
   (* method on_didFailLoad : *)
