@@ -276,7 +276,7 @@ class type browser_window = object
   method getTitle : unit -> Js.js_string Js.t Js.meth
 
   (** Starts or stops flashing the window to attract user's attention. *)
-  method flashFrame : unit -> unit Js.meth
+  method flashFrame : bool -> unit Js.meth
 
   (** Makes the window not show in the taskbar. *)
   method setSkipTaskbar : bool -> unit Js.meth
