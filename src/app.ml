@@ -1,3 +1,5 @@
+open Nodejs_kit
+
 class type app = object
 
   method getVersion : unit -> unit Js.meth
@@ -5,11 +7,10 @@ class type app = object
   method getName : unit -> unit Js.meth
 
   method on :
-    Js.js_string Js.t ->
+    js_str ->
     (unit -> unit) Js.callback ->
     unit Js.meth
 
 end
 
-let require () : app Js.t =
-  Nodejs_kit.require "app"
+let require () : app Js.t = require "app"

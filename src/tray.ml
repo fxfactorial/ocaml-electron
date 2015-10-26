@@ -1,25 +1,27 @@
+open Nodejs_kit
+
 class type tray = object
 
   method destroy : unit -> unit Js.meth
 
-  method setImage : Image.image Js.t -> unit Js.meth
+  method setImage : Native_image.image Js.t -> unit Js.meth
 
   (** OS X Only *)
-  method setPressedImage : Image.image Js.t -> unit Js.meth
+  method setPressedImage : Native_image.image Js.t -> unit Js.meth
 
-  method setToolTip : Js.js_string Js.t -> unit Js.meth
+  method setToolTip : js_str -> unit Js.meth
 
   (** OS X Only *)
-  method setTitle : Js.js_string Js.t -> unit Js.meth
+  method setTitle : js_str -> unit Js.meth
 
   (** OS X Only *)
   method setHighlightMode : bool -> unit Js.meth
 
   (** Windows Only *)
   method displayBallon :
-    <icon : Image.image Js.t;
-     title : Js.js_string Js.t;
-     content : Js.js_string Js.t> Js.t ->
+    <icon : Native_image.image Js.t;
+     title : js_str;
+     content : js_str> Js.t ->
     unit Js.meth
 
   (** OS X & Windows *)
@@ -33,8 +35,7 @@ class type tray = object
 
 end
 
-let tray : (Image.image -> tray Js.t) Js.constr =
+let tray : (Native_image.image -> tray Js.t) Js.constr =
   Js.Unsafe.js_expr "require(\"tray\")"
 
-let require () : tray Js.t =
-  Nodejs_kit.require "tray"
+let require () : tray Js.t = require "tray"

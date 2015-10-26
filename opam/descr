@@ -1,4 +1,5 @@
-OCaml bindings for electron
-These are OCaml bindings to electron Build electron based application
-with the type safety of OCaml
+js_of_ocaml bindings for electron
 
+js_of_ocaml bindings to electron, build electron based
+cross-platform applications with all the latest and greatest web
+technologies along with the type safety and joy of OCaml.

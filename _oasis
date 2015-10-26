@@ -1,25 +1,49 @@
 OASISFormat: 0.4
 Name:        electron
-Version:     0.0.1
-Synopsis:    OCaml bindings for electron
+Version:     0.1
+Synopsis:    js_of_ocaml bindings for electron
 Authors:     Edgar Aroutiounian <edgar.factorial@gmail.com>
 Maintainers: Edgar Aroutiounian <edgar.factorial@gmail.com>
-Homepage:    https://github.com/fxfactorial/ocaml-nodejs
+Homepage:    https://github.com/fxfactorial/ocaml-electron
 License:     BSD-3-clause
 Plugins:     META (0.4), DevFiles (0.4)
 BuildTools: ocamlbuild
 
 Description:
-  These are OCaml bindings to electron
+  These are js_of_ocaml bindings to electron
 
-  Build electron based application with the type safety of OCaml
+  js_of_ocaml bindings to electron, build electron based
+  cross-platform applications with all the latest and greatest web
+  technologies along with the type safety and joy of OCaml.
 
 Library electron
   Path:         src
   Modules:      Electron
   InternalModules:
-    App, Browser_window, Screen, Dialog, Clipboard,
-    Shortcut, Menu, Remote, Web_contents, Tray, Crash_reporter,
-    Power_monitor, Ipc
+    Clipboard, Crash_reporter, Native_image, Screen, Shell
   CompiledObject: byte
   BuildDepends: nodejs
+
+Library main_process
+  Path: src
+  Modules: Electron_main
+  FindlibName: main_process
+  FindlibParent: electron
+  InternalModules:
+    App, Auto_updater, Browser_window, Content_tracing,
+    Dialog, Global_shortcut, Ipc_main, Menu, Menu_item,
+    Power_monitor, Power_save_blocker, Protocol, Session,
+    Web_contents, Tray
+  install:true
+  CompiledObject: byte
+  BuildDepends: electron
+
+Library renderer
+  Path: src
+  Modules: Electron_renderer
+  FindlibName: renderer
+  FindlibParent: electron
+  InternalModules: Ipc_renderer, Remote, Web_frame
+  install:true
+  CompiledObject: byte
+  BuildDepends: electron
