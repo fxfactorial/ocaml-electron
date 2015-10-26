@@ -1,67 +1,46 @@
 These are `js_of_ocaml` bindings to [Electron](https://github.com/atom/electron). This is a great way to
-write cross platform `OCaml` GUI programs!
+write cross platform `OCaml` GUI programs with the latest and greatest
+web based technologies.
 
 # Example
 
-Here's a working example of a electron program:
+This is an electron program built at a hackathon using basecamp's Trix
+editor and these bindings.
+
 ![img](./electron_working.gif)
 
-The Source code for this program is:
+The source code for this program is:
 
 ```ocaml
-let () =
-  let app = Electron.App.require () in
-  let main_window = ref Js.null in
-  app##on
-    (Js.string "window-all-closed")
-    (Js.wrap_callback begin fun () ->
-        if (Js.to_string Nodejs.Process.process##.platform) <> "darwin"
-           then app##quit ()
-      end);
-  app##on
-    (Js.string "ready")
-    (Js.wrap_callback begin fun () ->
-
-        main_window :=
-          Js.Opt.return (Electron.Browser_window.make 800 600);
-
-        let main_window_now =
-          Js.Opt.get !main_window (fun () -> assert false)
-        in
-
-        main_window_now##loadUrl
-          (Js.string
-             (Printf.sprintf
-                "file://%s/index.html" (Nodejs_globals.__dirname ())));
-
-        main_window_now##openDevTools ();
-
-        main_window_now##on
-          (Js.string "closed")
-          (Js.wrap_callback begin fun () ->
-              main_window := Js.null
-          end)
-
-      end)
+ 1  open Nodejs_kit
+ 2  
+ 3  let () =
+ 4    let app = Electron_main.App.require () in
+ 5    let main_window = ref Js.null in
+ 6    app##on
+ 7      !$"window-all-closed"
+ 8      !@begin fun () ->
+ 9      if (Js.to_string Nodejs.Process.process##.platform) <> "darwin"
+10      then app##quit ()
+11    end;
+12    app##on
+13      !$"ready"
+14      !@begin fun () ->
+15  
+16      main_window :=
+17        Js.Opt.return
+18          (new%js Electron_main.Browser_window.browser_window
+19            (object%js val height = 600 val width = 800 end));
+20  
+21      let main_window_now = Js.Opt.get !main_window (fun () -> assert false) in
+22  
+23      main_window_now##loadUrl
+24        !$(Printf.sprintf "file://%s/index.html" (__dirname ()));
+25  
+26      main_window_now##on
+27        !$"closed"
+28        !@begin fun () ->
+29        main_window := Js.null
+30      end
+31    end
 ```
-
-To make this code work you'll need to have/do
-
-1.  `opam` : This is OCaml's package manager.
-2.  `js_of_ocaml` : `opam install js_of_ocaml`
-3.  `ocaml-nodejs` : 
-    
-    ```shell
-    $ git clone https://github.com/fxfactorial/ocaml-nodejs
-    $ cd ocaml-nodejs
-    $ opam pin add nodejs . -y
-    ```
-4.  `electron` : `npm install electron-prebuilt -g`
-5.  These electron bindings : 
-    
-    ```shell
-    $ git clone https://github.com/fxfactorial/ocaml-electron
-    $ cd ocaml-electron
-    $ opam pin add electron . -y
-    ```
-6.  Go to the `examples` directory, type `make`
