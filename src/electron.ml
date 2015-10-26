@@ -1,34 +1,22 @@
-let version = "0.1"
+(** These modules are allowed in use for both the main process and
+    render processes of electron *)
 
-(* module Screen = struct *)
-(*   include Screen *)
-(* end *)
+module Clipboard = struct
+  include Clipboard
+end
 
-(* module Dialog = struct *)
-(*   include Dialog *)
-(* end *)
+module Crash_reporter = struct
+  include Crash_reporter
+end
 
-(* module Clipboard = struct *)
-(*   include Clipboard *)
-(* end *)
+module Native_image = struct
+  include Native_image
+end
 
-(* module Shortcut = struct *)
-(*   include Shortcut *)
-(* end *)
+module Screen = struct
+  include Screen
+end
 
-(* module Menu = struct *)
-(*   include Menu *)
-(* end *)
-
-(* module Tray = struct *)
-(*   include Tray *)
-(* end *)
-
-(* module Crash_reporter = struct *)
-(*   include Crash_reporter *)
-(* end *)
-
-
-(* module Ipc = struct *)
-(*   include Ipc *)
-(* end *)
+module Shell = struct
+  include Shell
+end
