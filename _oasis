@@ -38,4 +38,4 @@ Library renderer
   FindlibParent: electron
   install:true
   CompiledObject: byte
-  BuildDepends: electron
+  BuildDepends: electron, electron.main_process

@@ -1,11 +1,24 @@
-(* module Ipc_renderer = struct *)
-(*   include Ipc_renderer *)
-(* end *)
+open Nodejs
 
-(* module Remote = struct *)
-(*   include Remote *)
-(* end *)
+module Ipc_renderer = struct
 
-(* module Web_frame = struct *)
-(*   include Web_frame *)
-(* end *)
+end
+
+module Remote = struct
+
+
+  class remote = object
+
+    val raw_js = require_module "remote"
+
+    method browser_window (o : Electron_main.Browser_window.opts) =
+      new Electron_main.Browser_window.browser_window ~remote:true o
+
+  end
+end
+
+
+
+module Web_frame = struct
+
+end

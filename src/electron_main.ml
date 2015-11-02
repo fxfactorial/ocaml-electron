@@ -1,20 +1,5 @@
 open Nodejs
 
-module type App = sig
-
-  class type app = object
-    (* method on_will_finish_launching : (unit -> unit) -> unit *)
-    method on_ready : (unit -> unit) -> unit
-    method on_window_all_closed : (unit -> unit) -> unit
-    (* method on_before_quit : (Events.event -> unit) -> unit *)
-
-    method quit : unit
-    method version : string
-    method name : string
-
-  end
-end
-
 module App = struct
 
   class app = object
@@ -38,16 +23,6 @@ module App = struct
   end
 end
 
-module type Browser_window = sig
-
-  type opts = {width: int; height : int}
-  class type browser_window = object
-    method on_closed : (unit -> unit) -> unit
-    method load_url : string -> unit
-    method open_dev_tools : unit
-  end
-
-end
 
 module Browser_window = struct
 
@@ -59,12 +34,19 @@ module Browser_window = struct
     obj_of_alist [("width", i w); ("height", i h)]
     |> stringify
 
-  class browser_window opts = object
+  class browser_window ?(remote=false) opts = object
 
     val raw_js =
-      (Printf.sprintf
-         "new (require(\"browser-window\"))(%s)" (of_opts opts))
-      |> Js.Unsafe.eval_string
+      match remote with
+      | false ->
+        (Printf.sprintf
+           "new (require(\"browser-window\"))(%s)" (of_opts opts))
+        |> Js.Unsafe.eval_string
+      |true ->
+        (Printf.sprintf
+           "new (require(\"remote\").require(\"browser-window\"))(%s)"
+           (of_opts opts))
+        |> Js.Unsafe.eval_string
 
     method load_url (s : string) : unit =
       m raw_js "loadUrl" [|i (Js.string s)|]
