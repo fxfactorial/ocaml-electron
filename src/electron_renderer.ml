@@ -1,5 +1,7 @@
 open Nodejs
 
+module B = Electron_main.Browser_window
+
 module Ipc_renderer = struct
 
 end
@@ -12,8 +14,17 @@ module Remote = struct
 
     val raw_js = require_module "remote"
 
-    method browser_window (o : b_opts) =
-      new Electron_main.Browser_window.browser_window ~remote:true o
+    method browser_window (o : b_opts) = new B.browser_window ~remote:true o
+
+    (* method get_current_window :  *)
+
+    (* method get_current_web_contents  *)
+
+    method get_global (s : string) : Js.Unsafe.any =
+      m raw_js "getGlobal" [|i (Js.string s)|]
+
+    method process : process =
+      raw_js <!> "process"
 
   end
 end
