@@ -19,8 +19,6 @@ Description:
 Library electron
   Path:         src
   Modules:      Electron
-  InternalModules:
-    Clipboard, Crash_reporter, Native_image, Screen, Shell
   CompiledObject: byte
   BuildDepends: nodejs
 
@@ -29,11 +27,6 @@ Library main_process
   Modules: Electron_main
   FindlibName: main_process
   FindlibParent: electron
-  InternalModules:
-    App, Auto_updater, Browser_window, Content_tracing,
-    Dialog, Global_shortcut, Ipc_main, Menu, Menu_item,
-    Power_monitor, Power_save_blocker, Protocol, Session,
-    Web_contents, Tray
   install:true
   CompiledObject: byte
   BuildDepends: electron
@@ -43,7 +36,6 @@ Library renderer
   Modules: Electron_renderer
   FindlibName: renderer
   FindlibParent: electron
-  InternalModules: Ipc_renderer, Remote, Web_frame
   install:true
   CompiledObject: byte
   BuildDepends: electron

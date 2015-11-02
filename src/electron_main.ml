@@ -1,56 +1,116 @@
+open Nodejs
 
-module App = struct
-  include App
+module type App = sig
+
+  class type app = object
+    (* method on_will_finish_launching : (unit -> unit) -> unit *)
+    method on_ready : (unit -> unit) -> unit
+    method on_window_all_closed : (unit -> unit) -> unit
+    (* method on_before_quit : (Events.event -> unit) -> unit *)
+
+    method quit : unit
+    method version : string
+    method name : string
+
+  end
 end
 
-module Auto_updater = struct
-  include Auto_updater
+module App = struct
+
+  class app = object
+    val raw_js = require_module "app"
+
+    method version : string =
+      m raw_js "getVersion" [||] |> Js.to_string
+
+    method name : string =
+      m raw_js "getName" [||] |> Js.to_string
+
+
+    method on_window_all_closed (f : (unit -> unit)) : unit =
+      m raw_js "on" [|i "on-window-all-closed"; i f|]
+
+    method quit : unit = m raw_js "quit" [||]
+
+    method on_ready (f : (unit -> unit)) : unit =
+      m raw_js "on" [|i "ready"; i f|]
+
+  end
+end
+
+module type Browser_window = sig
+
+  type opts = {width: int; height : int}
+  class type browser_window = object
+    method on_closed : (unit -> unit) -> unit
+    method load_url : string -> unit
+    method open_dev_tools : unit
+  end
+
 end
 
 module Browser_window = struct
-  include Browser_window
+
+  type opts = {width: int; height : int}
+
+  let of_opts
+      {width = w;
+       height = h} =
+    obj_of_alist [("width", i w); ("height", i h)]
+    |> stringify
+
+  class browser_window opts = object
+
+    val raw_js =
+      (Printf.sprintf
+         "new (require(\"browser-window\"))(%s)" (of_opts opts))
+      |> Js.Unsafe.eval_string
+
+    method load_url (s : string) : unit =
+      m raw_js "loadUrl" [|i (Js.string s)|]
+
+    method open_dev_tools : unit =
+      m raw_js "openDevTools" [||]
+
+    method on_closed (f : (unit -> unit)) : unit =
+      m raw_js "on" [|i "closed"; i f|]
+
+  end
+
+end
+
+module Auto_updater = struct
 end
 
 module Content_tracing = struct
-  include Content_tracing
 end
 
 module Dialog = struct
-  include Dialog
 end
 
 module Global_shortcut = struct
-  include Global_shortcut
 end
 
 module Ipc_main = struct
-  include Ipc_main
 end
 
 module Menu = struct
-  include Menu_item
 end
 
 module Power_monitor = struct
-  include Power_monitor
 end
 
 module Power_save_blocker = struct
-  include Power_save_blocker
 end
 
 module Protocol = struct
-  include Protocol
 end
 
 module Session = struct
-  include Session
 end
 
 module Web_contents = struct
-  include Web_contents
 end
 
 module Tray = struct
-  include Tray
 end
