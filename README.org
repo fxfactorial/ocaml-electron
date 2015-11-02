@@ -69,8 +69,7 @@ let renderer_program () =
       Lwt_js_events.clicks b begin fun ev thread ->
 
         let remote =
-          (new R.remote)#browser_window
-            Electron_main.Browser_window.({width = 800; height = 600})
+          (new R.remote)#browser_window R.({width = 800; height = 600})
         in
         remote#open_dev_tools;
 

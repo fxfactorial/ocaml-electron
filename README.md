@@ -64,19 +64,18 @@ And the **renderer process**:
 21        Lwt_js_events.clicks b begin fun ev thread ->
 22  
 23          let remote =
-24            (new R.remote)#browser_window
-25              Electron_main.Browser_window.({width = 800; height = 600})
-26          in
-27          remote#open_dev_tools;
-28  
-29          Lwt.return ()
-30        end
-31      end;
-32  
-33      Js.Opt.return ()
-34    | _ -> assert false
-35  
-36  let () = ignore (renderer_program ())
+24            (new R.remote)#browser_window R.({width = 800; height = 600})
+25          in
+26          remote#open_dev_tools;
+27  
+28          Lwt.return ()
+29        end
+30      end;
+31  
+32      Js.Opt.return ()
+33    | _ -> assert false
+34  
+35  let () = ignore (renderer_program ())
 ```
 
 Pretty amazing.
