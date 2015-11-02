@@ -1,3 +1,6 @@
+(** These are modules mainly intended for usage from the main
+    process *)
+
 open Nodejs
 
 module App = struct

@@ -1,3 +1,6 @@
+(** These are modules intended for usage from the renderer process,
+    aka your actual page *)
+
 open Nodejs
 
 module B = Electron_main.Browser_window

@@ -67,9 +67,12 @@ module Shell = struct
     method open_external (s : string) : unit =
       m raw_js "openExternal" [|i (Js.string s)|]
 
-    method move_item_to_trash (s : string) : unit =
-      m raw_js "moveItemToTrash" [|i (Js.string s)|]
+    (** Move the given file to trash and returns a boolean status for
+        the operation. *)
+    method move_item_to_trash (s : string) : bool =
+      m raw_js "moveItemToTrash" [|i (Js.string s)|] |> Js.to_bool
 
+    (** Play the beep sound. *)
     method beep : unit =
       m raw_js "beep" [||]
 
