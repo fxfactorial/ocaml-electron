@@ -17,36 +17,29 @@ editor and these bindings.
 The source code for this program is:
 
 #+BEGIN_SRC ocaml -n
-open Nodejs_kit
+open Nodejs
+
+module B = Electron_main.Browser_window
 
 let () =
-  let app = Electron_main.App.require () in
   let main_window = ref Js.null in
-  app##on
-    !$"window-all-closed"
-    !@begin fun () ->
-    if (Js.to_string Nodejs.Process.process##.platform) <> "darwin"
-    then app##quit ()
-  end;
-  app##on
-    !$"ready"
-    !@begin fun () ->
+  let app = new Electron_main.App.app in
+  let p = new process in
 
-    main_window :=
-      Js.Opt.return
-        (new%js Electron_main.Browser_window.browser_window
-          (object%js val height = 600 val width = 800 end));
+  Printf.sprintf "Running %s %s on %s" app#name app#version p#platform
+  |> print_endline;
 
-    let main_window_now = Js.Opt.get !main_window (fun () -> assert false) in
+  app#on_window_all_closed (fun () -> if p#platform <> "darwin" then app#quit);
 
-    main_window_now##loadUrl
-      !$(Printf.sprintf "file://%s/index.html" (__dirname ()));
+  app#on_ready begin fun () ->
 
-    main_window_now##on
-      !$"closed"
-      !@begin fun () ->
-      main_window := Js.null
-    end
+    let b = new B.browser_window B.({width = 800; height = 600}) in
+    main_window := Js.Opt.return b;
+
+    b#load_url (Printf.sprintf "file://%s/index.html" (__dirname ()));
+
+    b#on_closed (fun () -> main_window := Js.null )
+
   end
 #+END_SRC
-
+Pretty amazing.

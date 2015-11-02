@@ -12,35 +12,30 @@ editor and these bindings.
 The source code for this program is:
 
 ```ocaml
- 1  open Nodejs_kit
+ 1  open Nodejs
  2  
- 3  let () =
- 4    let app = Electron_main.App.require () in
- 5    let main_window = ref Js.null in
- 6    app##on
- 7      !$"window-all-closed"
- 8      !@begin fun () ->
- 9      if (Js.to_string Nodejs.Process.process##.platform) <> "darwin"
-10      then app##quit ()
-11    end;
-12    app##on
-13      !$"ready"
-14      !@begin fun () ->
-15  
-16      main_window :=
-17        Js.Opt.return
-18          (new%js Electron_main.Browser_window.browser_window
-19            (object%js val height = 600 val width = 800 end));
-20  
-21      let main_window_now = Js.Opt.get !main_window (fun () -> assert false) in
-22  
-23      main_window_now##loadUrl
-24        !$(Printf.sprintf "file://%s/index.html" (__dirname ()));
-25  
-26      main_window_now##on
-27        !$"closed"
-28        !@begin fun () ->
-29        main_window := Js.null
-30      end
-31    end
+ 3  module B = Electron_main.Browser_window
+ 4  
+ 5  let () =
+ 6    let main_window = ref Js.null in
+ 7    let app = new Electron_main.App.app in
+ 8    let p = new process in
+ 9  
+10    Printf.sprintf "Running %s %s on %s" app#name app#version p#platform
+11    |> print_endline;
+12  
+13    app#on_window_all_closed (fun () -> if p#platform <> "darwin" then app#quit);
+14  
+15    app#on_ready begin fun () ->
+16  
+17      let b = new B.browser_window B.({width = 800; height = 600}) in
+18      main_window := Js.Opt.return b;
+19  
+20      b#load_url (Printf.sprintf "file://%s/index.html" (__dirname ()));
+21  
+22      b#on_closed (fun () -> main_window := Js.null )
+23  
+24    end
 ```
+
+Pretty amazing.
