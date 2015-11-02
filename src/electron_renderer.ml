@@ -11,7 +11,7 @@ end
 
 module Remote = struct
 
-  type b_opts = Electron_main.Browser_window.opts
+  type b_opts = Electron_main.Browser_window.browser_opts
 
   class remote = object
 

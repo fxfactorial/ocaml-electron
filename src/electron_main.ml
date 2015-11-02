@@ -26,16 +26,86 @@ module App = struct
   end
 end
 
+module Session = struct
+
+  class session raw_js = object
+
+  end
+
+end
 
 module Browser_window = struct
 
-  type opts = {width: int; height : int}
+  type browser_opts = {width: int; height : int}
+
+  type url_opts = { http_referrer : string;
+                    user_agent : string;
+                    extra_headers : string list; }
 
   let of_opts
       {width = w;
        height = h} =
     obj_of_alist [("width", i w); ("height", i h)]
     |> stringify
+
+  class web_contents raw_js = object
+
+    method on_did_finish_load (f : (unit -> unit)) : unit =
+      m raw_js "on" [|i (Js.string "did-finish-load"); i f|]
+
+    method on_did_fail_load
+        (f : (Events.event -> int -> string -> string -> unit)) : unit =
+      m raw_js "on" [|i (Js.string "did-fail-load"); i f|]
+
+    method on_did_frame_finish_load
+        (f : (Events.event -> bool -> unit)) : unit =
+      m raw_js "on" [|i (Js.string "did-frame-finish-load"); i f|]
+
+    (* method on_did_start_loading :  *)
+
+    (* method on_did_stop_loading :  *)
+
+    (* method on_did_get_response_details:  *)
+
+    (* method on_did_get_redirect_request :  *)
+
+    (* method on_dom_ready :  *)
+
+    (* method on_page_favicon_updated :  *)
+
+    (* method on_new_window  *)
+
+    (* method on_will_navigate  *)
+
+    (* method on_crashed  *)
+
+    (* method on_plugin_crashed *)
+
+    (* method on_destroyed:  *)
+
+    (* method on_devtools_opened *)
+
+    (* method on_devtools_closed : *)
+
+    (* method on_devtools_focused  *)
+
+    (* method on_login  *)
+
+    method session : Session.session =
+      new Session.session raw_js <!> "session"
+
+    method load_url ?opts url : unit =
+      match opts with
+      | None -> m raw_js "loadUrl" [|i (Js.string url)|]
+      | Some {http_referrer = r;
+              user_agent = a;
+              extra_headers = h} ->
+        let obj = obj_of_alist [("httpReferrer", r);
+                                ("userAgent", a);
+                                ("extraHeaders", String.concat "\n" h)] in
+        m raw_js "loadUrl" [|i (Js.string url); i obj|]
+
+  end
 
   class browser_window ?(remote=false) opts = object
 
@@ -59,6 +129,9 @@ module Browser_window = struct
 
     method on_closed (f : (unit -> unit)) : unit =
       m raw_js "on" [|i "closed"; i f|]
+
+    method web_contents : web_contents =
+      new web_contents (raw_js <!> "webContents")
 
   end
 
@@ -91,8 +164,6 @@ end
 module Protocol = struct
 end
 
-module Session = struct
-end
 
 module Web_contents = struct
 end
