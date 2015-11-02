@@ -14,7 +14,7 @@ editor and these bindings.
 
 [[./electron_working.gif]]
 
-The source code for this program is:
+The source code for this program is, *main process* first:
 
 #+BEGIN_SRC ocaml -n
 open Nodejs
@@ -41,5 +41,46 @@ let () =
     b#on_closed (fun () -> main_window := Js.null )
 
   end
+#+END_SRC
+
+And the *renderer process*:
+
+#+BEGIN_SRC ocaml -n
+let (>>$) = Js.Opt.bind
+
+module R = Electron_renderer.Remote
+
+let getElementsByClassName (name : string)
+  : Dom_html.element Dom.nodeList Js.t =
+  Js.Unsafe.meth_call
+    Dom_html.document "getElementsByClassName" [|Js.Unsafe.inject (Js.string name)|]
+
+let renderer_program () =
+  let script = Dom_html.createScript Dom_html.document in
+  script##.src := (Js.string "client/vendor/trix.js");
+  Dom.appendChild Dom_html.document##.head script;
+
+  let publish_buttons = getElementsByClassName "editor--publish-button" in
+
+  match Dom.list_of_nodeList publish_buttons with
+  | button :: _ ->
+    Dom_html.CoerceTo.button button >>$ fun b ->
+    Lwt.async begin fun () ->
+      Lwt_js_events.clicks b begin fun ev thread ->
+
+        let remote =
+          (new R.remote)#browser_window
+            Electron_main.Browser_window.({width = 800; height = 600})
+        in
+        remote#open_dev_tools;
+
+        Lwt.return ()
+      end
+    end;
+
+    Js.Opt.return ()
+  | _ -> assert false
+
+let () = ignore (renderer_program ())
 #+END_SRC
 Pretty amazing.
