@@ -121,11 +121,11 @@ module Screen = struct
 
     method on_display_added
         (f : (Events.event -> Js.Unsafe.any -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "display-added"); i f|]
+      m raw_js "on" [|i (Js.string "display-added"); i !@f|]
 
     method on_display_removed
         (f : (Events.event -> Js.Unsafe.any -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "display-removed"); i f|]
+      m raw_js "on" [|i (Js.string "display-removed"); i !@f|]
 
     (** Emitted when one or more metrics change in a display. The
         array is made up of strings that describe the
@@ -135,7 +135,7 @@ module Screen = struct
       (f : (Events.event ->
             Js.Unsafe.any ->
             string Js.js_array-> unit)) : unit =
-      m raw_js "on" [|i (Js.string "display-metrics-changed"); i f|]
+      m raw_js "on" [|i (Js.string "display-metrics-changed"); i !@f|]
 
     method get_cursor_screen_point : <x : int; y : int> =
       let rect = m raw_js "getCursorScreenPoint" [||] in

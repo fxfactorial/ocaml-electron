@@ -16,12 +16,12 @@ module App = struct
 
 
     method on_window_all_closed (f : (unit -> unit)) : unit =
-      m raw_js "on" [|i "on-window-all-closed"; i f|]
+      m raw_js "on" [|i "on-window-all-closed"; i !@f|]
 
     method quit : unit = m raw_js "quit" [||]
 
     method on_ready (f : (unit -> unit)) : unit =
-      m raw_js "on" [|i "ready"; i f|]
+      m raw_js "on" [|i "ready"; i !@f|]
 
   end
 end
@@ -36,7 +36,8 @@ end
 
 module Browser_window = struct
 
-  type browser_opts = {width: int; height : int}
+  type browser_opts = { width: int;
+                        height : int; }
 
   type url_opts = { http_referrer : string;
                     user_agent : string;
@@ -51,15 +52,15 @@ module Browser_window = struct
   class web_contents raw_js = object
 
     method on_did_finish_load (f : (unit -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "did-finish-load"); i f|]
+      m raw_js "on" [|i (Js.string "did-finish-load"); i !@f|]
 
     method on_did_fail_load
         (f : (Events.event -> int -> string -> string -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "did-fail-load"); i f|]
+      m raw_js "on" [|i (Js.string "did-fail-load"); i !@f|]
 
     method on_did_frame_finish_load
         (f : (Events.event -> bool -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "did-frame-finish-load"); i f|]
+      m raw_js "on" [|i (Js.string "did-frame-finish-load"); i !@f|]
 
     (* method on_did_start_loading :  *)
 
@@ -105,6 +106,107 @@ module Browser_window = struct
                                 ("extraHeaders", String.concat "\n" h)] in
         m raw_js "loadUrl" [|i (Js.string url); i obj|]
 
+    method get_url =
+      m raw_js "getUrl" [||] |> Js.to_string
+
+    method get_title =
+      m raw_js "getTitle" [||] |> Js.to_string
+
+    method is_loading =
+      m raw_js "isLoading" [||] |> Js.to_bool
+
+    method is_waiting_for_response =
+      m raw_js "isWaitingForResponse" [||] |> Js.to_bool
+
+    method stop : unit =
+      m raw_js "stop" [||]
+
+    method reload : unit =
+      m raw_js "reload" [||]
+
+    method reload_ignoring_cache : unit =
+      m raw_js "reloadIgnoringCache" [||]
+
+    method can_go_back =
+      m raw_js "canGoBack" [||] |> Js.to_bool
+
+    method can_go_forward =
+      m raw_js "canGoForward" [||] |> Js.to_bool
+
+    method can_go_to_offset (j : int) =
+      m raw_js "canGoToOffset" [|i j|] |> Js.to_bool
+
+    method clear_history : unit =
+      m raw_js "clearHistory" [||]
+
+    method go_back : unit =
+      m raw_js "goBack" [||]
+
+    method go_forward : unit =
+      m raw_js "goForward" [||]
+
+    method go_to_index (j : int) : unit =
+      m raw_js "goToIndex" [|i j|]
+
+    method go_to_offset (j : int) : unit =
+      m raw_js "goToOffset" [|i j|]
+
+    method is_crashed =
+      m raw_js "isCrashed" [||] |> Js.to_bool
+
+    method set_user_agent (s : string) : unit =
+      m raw_js "setUserAgent" [|i (Js.string s)|]
+
+    method get_user_agent =
+      m raw_js "getUserAgent" [||] |> Js.to_string
+
+    method insert_css (css : string) : unit =
+      m raw_js "insertCss" [|i (Js.string css)|]
+
+    method execute_javascript
+        ?(user_gesture : bool option)
+        (code : string) : unit =
+      match user_gesture with
+      | None -> m raw_js "executeJavaScript" [|i (Js.string code)|]
+      | Some b -> m raw_js "executeJavaScript" [|i (Js.string code); i b|]
+
+    method set_audio_muted (b : bool) : unit =
+      m raw_js "setAudioMuted" [|i b|]
+
+    method is_audio_muted : bool =
+      m raw_js "isAudioMuted" [||] |> Js.to_bool
+
+    method undo : unit =
+      m raw_js "undo" [||]
+
+    method redo : unit =
+      m raw_js "redo" [||]
+
+    method cut : unit =
+      m raw_js "cut" [||]
+
+    method copy : unit =
+      m raw_js "copy" [||]
+
+    method paste : unit =
+      m raw_js "paste" [||]
+
+    method paste_and_match_style : unit =
+      m raw_js "pasteAndMatchStyle" [||]
+
+    method delete : unit =
+      m raw_js "delete" [||]
+
+    method select_all : unit =
+      m raw_js "selectAll" [||]
+
+    method unselect : unit =
+      m raw_js "unselect" [||]
+
+    method replace (s : string) : unit =
+      m raw_js "replace" [|i (Js.string s)|]
+
+
   end
 
   class browser_window ?(remote=false) opts = object
@@ -128,7 +230,7 @@ module Browser_window = struct
       m raw_js "openDevTools" [||]
 
     method on_closed (f : (unit -> unit)) : unit =
-      m raw_js "on" [|i "closed"; i f|]
+      m raw_js "on" [|i "closed"; i !@f|]
 
     method web_contents : web_contents =
       new web_contents (raw_js <!> "webContents")
