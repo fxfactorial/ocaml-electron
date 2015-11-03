@@ -18,13 +18,11 @@ module Remote = struct
     val raw_js = require_module "remote"
 
     method browser_window (o : b_opts) =
-      new B.browser_window ~remote:true ~existing:None ~opts:o
+      new B.browser_window ~remote:true ~opts:o None
 
     method get_current_window =
-      new B.browser_window
-        ~remote:false
-        ~existing:(m raw_js "getCurrentWindow" [||])
-        ?opts:None
+      (Some (m raw_js "getCurrentWindow" [||]))
+      |> new B.browser_window ~remote:false ?opts:None
 
     (* method get_current_web_contents  *)
 

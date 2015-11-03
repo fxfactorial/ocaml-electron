@@ -257,7 +257,7 @@ module Browser_window = struct
 
   end
 
-  class browser_window ?(remote=false) ?opts ?existing = object
+  class browser_window ?(remote=false) ?opts existing = object
 
     val raw_js =
       let result = match opts with
