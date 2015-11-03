@@ -28,8 +28,56 @@ end
 
 module Session = struct
 
+  class cookies raw_js = object
+
+    method name =
+      raw_js <!> "name" |> Js.to_string
+
+    method value =
+      raw_js <!> "value" |> Js.to_string
+
+    method domain =
+      raw_js <!> "domain" |> Js.to_string
+
+    method host_only =
+      raw_js <!> "host_only" |> Js.to_string
+
+    method path =
+      raw_js <!> "path" |> Js.to_string
+
+    method secure =
+      raw_js <!> "secure" |> Js.to_bool
+
+    method http_only =
+      raw_js <!> "http_only" |> Js.to_bool
+
+    method session =
+      raw_js <!> "session" |> Js.to_bool
+
+    method expiration_date =
+      raw_js <!> "expirationDate" |> Js.to_float
+
+  end
+
+  type details = {url : string;
+                  name : string;
+                  domain : string;
+                  path : string;
+                  secure : bool;
+                  session : bool;
+                  callback : (Error.error -> cookies -> unit);
+                  error : Error.error;
+                  cookies : cookies array; }
+
+  class download_item = object end
+
   class session raw_js = object
 
+    (* not sure how to do this mutually recurisve issue...session
+       needed in browser_window but web_contents needed in session *)
+    (* method on_will_download (f : (Events.event -> download_item)) *)
+
+    (* method cookies_get :  *)
   end
 
 end
@@ -209,19 +257,25 @@ module Browser_window = struct
 
   end
 
-  class browser_window ?(remote=false) opts = object
+  class browser_window ?(remote=false) ?opts ?existing = object
 
     val raw_js =
-      match remote with
-      | false ->
-        (Printf.sprintf
-           "new (require(\"browser-window\"))(%s)" (of_opts opts))
-        |> Js.Unsafe.eval_string
-      |true ->
-        (Printf.sprintf
-           "new (require(\"remote\").require(\"browser-window\"))(%s)"
-           (of_opts opts))
-        |> Js.Unsafe.eval_string
+      let result = match opts with
+        | None -> ""
+        | Some o -> "(" ^ of_opts o ^ ")"
+      in
+      match existing with
+      | None ->
+        (match remote with
+        | false ->
+          (Printf.sprintf
+             "new (require(\"browser-window\"))%s" result)
+          |> Js.Unsafe.eval_string
+        |true ->
+          (Printf.sprintf
+             "new (require(\"remote\").require(\"browser-window\"))%s" result)
+          |> Js.Unsafe.eval_string)
+      | Some e -> e
 
     method load_url (s : string) : unit =
       m raw_js "loadUrl" [|i (Js.string s)|]
