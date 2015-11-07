@@ -353,245 +353,315 @@ module Browser_window = struct
      transparent = None; window_type = None; standard_window = None;
      title_bar_style = None; web_preferences = Some simple_web_prefs}
 
-class web_contents raw_js = object
+  class web_contents raw_js = object
 
-  method on_did_finish_load (f : (unit -> unit)) : unit =
-    m raw_js "on" [|i (Js.string "did-finish-load"); i !@f|]
+    method on_did_finish_load (f : (unit -> unit)) : unit =
+      m raw_js "on" [|i (Js.string "did-finish-load"); i !@f|]
 
-  method on_did_fail_load
-      (f : (Events.event -> int -> string -> string -> unit)) : unit =
-    m raw_js "on" [|i (Js.string "did-fail-load"); i !@f|]
+    method on_did_fail_load
+        (f : (Events.event -> int -> string -> string -> unit)) : unit =
+      m raw_js "on" [|i (Js.string "did-fail-load"); i !@f|]
 
-  method on_did_frame_finish_load
-      (f : (Events.event -> bool -> unit)) : unit =
-    m raw_js "on" [|i (Js.string "did-frame-finish-load"); i !@f|]
+    method on_did_frame_finish_load
+        (f : (Events.event -> bool -> unit)) : unit =
+      m raw_js "on" [|i (Js.string "did-frame-finish-load"); i !@f|]
 
-  (* method on_did_start_loading :  *)
+    (* method on_did_start_loading :  *)
 
-  (* method on_did_stop_loading :  *)
+    (* method on_did_stop_loading :  *)
 
-  (* method on_did_get_response_details:  *)
+    (* method on_did_get_response_details:  *)
 
-  (* method on_did_get_redirect_request :  *)
+    (* method on_did_get_redirect_request :  *)
 
-  (* method on_dom_ready :  *)
+    (* method on_dom_ready :  *)
 
-  (* method on_page_favicon_updated :  *)
+    (* method on_page_favicon_updated :  *)
 
-  (* method on_new_window  *)
+    (* method on_new_window  *)
 
-  (* method on_will_navigate  *)
+    (* method on_will_navigate  *)
 
-  (* method on_crashed  *)
+    (* method on_crashed  *)
 
-  (* method on_plugin_crashed *)
+    (* method on_plugin_crashed *)
 
-  (* method on_destroyed:  *)
+    (* method on_destroyed:  *)
 
-  (* method on_devtools_opened *)
+    (* method on_devtools_opened *)
 
-  (* method on_devtools_closed : *)
+    (* method on_devtools_closed : *)
 
-  (* method on_devtools_focused  *)
+    (* method on_devtools_focused  *)
 
-  (* method on_login  *)
+    (* method on_login  *)
 
-  method session : Session.session =
-    new Session.session raw_js <!> "session"
+    method session : Session.session =
+      new Session.session raw_js <!> "session"
 
-  method load_url ?opts url : unit =
-    match opts with
-    | None -> m raw_js "loadUrl" [|i (Js.string url)|]
-    | Some {http_referrer = r;
-            user_agent = a;
-            extra_headers = h} ->
-      let obj = obj_of_alist [("httpReferrer", r);
-                              ("userAgent", a);
-                              ("extraHeaders", String.concat "\n" h)] in
-      m raw_js "loadUrl" [|i (Js.string url); i obj|]
+    method load_url ?opts url : unit =
+      match opts with
+      | None -> m raw_js "loadUrl" [|i (Js.string url)|]
+      | Some {http_referrer = r;
+              user_agent = a;
+              extra_headers = h} ->
+        let obj = obj_of_alist [("httpReferrer", r);
+                                ("userAgent", a);
+                                ("extraHeaders", String.concat "\n" h)] in
+        m raw_js "loadUrl" [|i (Js.string url); i obj|]
 
-  method get_url =
-    m raw_js "getUrl" [||] |> Js.to_string
+    method get_url =
+      m raw_js "getUrl" [||] |> Js.to_string
 
-  method get_title =
-    m raw_js "getTitle" [||] |> Js.to_string
+    method get_title =
+      m raw_js "getTitle" [||] |> Js.to_string
 
-  method is_loading =
-    m raw_js "isLoading" [||] |> Js.to_bool
+    method is_loading =
+      m raw_js "isLoading" [||] |> Js.to_bool
 
-  method is_waiting_for_response =
-    m raw_js "isWaitingForResponse" [||] |> Js.to_bool
+    method is_waiting_for_response =
+      m raw_js "isWaitingForResponse" [||] |> Js.to_bool
 
-  method stop : unit =
-    m raw_js "stop" [||]
+    method stop : unit =
+      m raw_js "stop" [||]
 
-  method reload : unit =
-    m raw_js "reload" [||]
+    method reload : unit =
+      m raw_js "reload" [||]
 
-  method reload_ignoring_cache : unit =
-    m raw_js "reloadIgnoringCache" [||]
+    method reload_ignoring_cache : unit =
+      m raw_js "reloadIgnoringCache" [||]
 
-  method can_go_back =
-    m raw_js "canGoBack" [||] |> Js.to_bool
+    method can_go_back =
+      m raw_js "canGoBack" [||] |> Js.to_bool
 
-  method can_go_forward =
-    m raw_js "canGoForward" [||] |> Js.to_bool
+    method can_go_forward =
+      m raw_js "canGoForward" [||] |> Js.to_bool
 
-  method can_go_to_offset (j : int) =
-    m raw_js "canGoToOffset" [|i j|] |> Js.to_bool
+    method can_go_to_offset (j : int) =
+      m raw_js "canGoToOffset" [|i j|] |> Js.to_bool
 
-  method clear_history : unit =
-    m raw_js "clearHistory" [||]
+    method clear_history : unit =
+      m raw_js "clearHistory" [||]
 
-  method go_back : unit =
-    m raw_js "goBack" [||]
+    method go_back : unit =
+      m raw_js "goBack" [||]
 
-  method go_forward : unit =
-    m raw_js "goForward" [||]
+    method go_forward : unit =
+      m raw_js "goForward" [||]
 
-  method go_to_index (j : int) : unit =
-    m raw_js "goToIndex" [|i j|]
+    method go_to_index (j : int) : unit =
+      m raw_js "goToIndex" [|i j|]
 
-  method go_to_offset (j : int) : unit =
-    m raw_js "goToOffset" [|i j|]
+    method go_to_offset (j : int) : unit =
+      m raw_js "goToOffset" [|i j|]
 
-  method is_crashed =
-    m raw_js "isCrashed" [||] |> Js.to_bool
+    method is_crashed =
+      m raw_js "isCrashed" [||] |> Js.to_bool
 
-  method set_user_agent (s : string) : unit =
-    m raw_js "setUserAgent" [|i (Js.string s)|]
+    method set_user_agent (s : string) : unit =
+      m raw_js "setUserAgent" [|i (Js.string s)|]
 
-  method get_user_agent =
-    m raw_js "getUserAgent" [||] |> Js.to_string
+    method get_user_agent =
+      m raw_js "getUserAgent" [||] |> Js.to_string
 
-  method insert_css (css : string) : unit =
-    m raw_js "insertCss" [|i (Js.string css)|]
+    method insert_css (css : string) : unit =
+      m raw_js "insertCss" [|i (Js.string css)|]
 
-  method execute_javascript
-      ?(user_gesture : bool option)
-      (code : string) : unit =
-    match user_gesture with
-    | None -> m raw_js "executeJavaScript" [|i (Js.string code)|]
-    | Some b -> m raw_js "executeJavaScript" [|i (Js.string code); i b|]
+    method execute_javascript
+        ?(user_gesture : bool option)
+        (code : string) : unit =
+      match user_gesture with
+      | None -> m raw_js "executeJavaScript" [|i (Js.string code)|]
+      | Some b -> m raw_js "executeJavaScript" [|i (Js.string code); i b|]
 
-  method set_audio_muted (b : bool) : unit =
-    m raw_js "setAudioMuted" [|i b|]
+    method set_audio_muted (b : bool) : unit =
+      m raw_js "setAudioMuted" [|i b|]
 
-  method is_audio_muted : bool =
-    m raw_js "isAudioMuted" [||] |> Js.to_bool
+    method is_audio_muted : bool =
+      m raw_js "isAudioMuted" [||] |> Js.to_bool
 
-  method undo : unit =
-    m raw_js "undo" [||]
+    method undo : unit =
+      m raw_js "undo" [||]
 
-  method redo : unit =
-    m raw_js "redo" [||]
+    method redo : unit =
+      m raw_js "redo" [||]
 
-  method cut : unit =
-    m raw_js "cut" [||]
+    method cut : unit =
+      m raw_js "cut" [||]
 
-  method copy : unit =
-    m raw_js "copy" [||]
+    method copy : unit =
+      m raw_js "copy" [||]
 
-  method paste : unit =
-    m raw_js "paste" [||]
+    method paste : unit =
+      m raw_js "paste" [||]
 
-  method paste_and_match_style : unit =
-    m raw_js "pasteAndMatchStyle" [||]
+    method paste_and_match_style : unit =
+      m raw_js "pasteAndMatchStyle" [||]
 
-  method delete : unit =
-    m raw_js "delete" [||]
+    method delete : unit =
+      m raw_js "delete" [||]
 
-  method select_all : unit =
-    m raw_js "selectAll" [||]
+    method select_all : unit =
+      m raw_js "selectAll" [||]
 
-  method unselect : unit =
-    m raw_js "unselect" [||]
+    method unselect : unit =
+      m raw_js "unselect" [||]
 
-  method replace (s : string) : unit =
-    m raw_js "replace" [|i (Js.string s)|]
+    method replace (s : string) : unit =
+      m raw_js "replace" [|i (Js.string s)|]
 
-end
+  end
 
-class browser_window ?(remote=false) ?opts existing = object
 
-  val raw_js =
-    let result = match opts with
-      | None -> ""
-      | Some o -> "(" ^ of_opts o ^ ")"
-    in
-    match existing with
-    | None ->
-      (match remote with
-       | false ->
-         (Printf.sprintf
-            "new (require(\"browser-window\"))%s" result)
-         |> Js.Unsafe.eval_string
-       |true ->
-         (Printf.sprintf
-            "new (require(\"remote\").require(\"browser-window\"))%s" result)
-         |> Js.Unsafe.eval_string)
-    | Some e -> e
+  class browser_window ?(remote=false) ?opts existing = object
 
-  method load_url (s : string) : unit = m raw_js "loadUrl" [|i (Js.string s)|]
+    val raw_js =
+      let result = match opts with
+        | None -> ""
+        | Some o -> "(" ^ of_opts o ^ ")"
+      in
+      match existing with
+      | None ->
+        (match remote with
+         | false ->
+           (Printf.sprintf
+              "new (require(\"browser-window\"))%s" result)
+           |> Js.Unsafe.eval_string
+         |true ->
+           (Printf.sprintf
+              "new (require(\"remote\").require(\"browser-window\"))%s" result)
+           |> Js.Unsafe.eval_string)
+      | Some e -> e
 
-  method open_dev_tools : unit = m raw_js "openDevTools" [||]
+    method load_url (s : string) : unit = m raw_js "loadUrl" [|i (Js.string s)|]
 
-  method on_closed (f : (unit -> unit)) : unit =
-    m raw_js "on" [|i "closed"; i !@f|]
+    method open_dev_tools : unit = m raw_js "openDevTools" [||]
 
-  method web_contents : web_contents =
-    new web_contents (raw_js <!> "webContents")
+    method on_closed (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "closed"; i !@f|]
 
-  method id : int = raw_js <!> "id"
+    method on_close (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "close"; i !@f|]
 
-  (** Force closing the window, the unload and beforeunload event
-      won't be emitted for the web page, and close event will also not
-      be emitted for this window, but it guarantees the closed event
-      will be emitted.
+    method on_unresponsive (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "unresponsive"; i !@f|]
 
-      You should only use this method when the renderer process (web
-      page) has crashed.*)
-  method destory : unit = m raw_js "destroy" [||]
+    method on_responsive (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "responsive"; i !@f|]
 
-  (** Try to close the window, this has the same effect with user
-      manually clicking the close button of the window. The web page may
-      cancel the close though, see the close event.*)
-  method close : unit = m raw_js "close" [||]
+    method on_blur (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "blur"; i !@f|]
 
-  method focus : unit = m raw_js "focus" [||]
+    method on_focus (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "focus"; i !@f|]
 
-  method is_focused : bool = m raw_js "isFocused" [||]
+    method on_maximize (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "maximize"; i !@f|]
 
-  method show : unit = m raw_js "show" [||]
+    method on_unmaximize (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "unmaximize"; i !@f|]
 
-  method show_inactive : unit = m raw_js "showInactive" [||]
+    method on_minimize (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "minimize"; i !@f|]
 
-  method hide : unit = m raw_js "hide" [||]
+    method on_restore (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "restore"; i !@f|]
 
-  method is_visible : bool = m raw_js "isVisible" [||]
+    method on_resize (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "resize"; i !@f|]
 
-  method maximize : unit = m raw_js "maximize" [||]
+    method on_move (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "move"; i !@f|]
 
-  method unmaximize : unit = m raw_js "unmaximize" [||]
+    method on_movd (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "moved"; i !@f|]
 
-  method is_maximized : bool = m raw_js "unmaximize" [||]
+    method on_enter_full_screen (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "enter-full-screen"; i !@f|]
 
-  method minimize : unit = m raw_js "minimize" [||]
+    method on_leave_full_screen (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "leave-full-screen"; i !@f|]
 
-  method set_fullscreen b : unit =
-    if b then m raw_js "setFullScreen" [|i true|]
-    else m raw_js "setFullScreen" [|i false|]
+    method on_enter_html_full_screen (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "enter-html-full-screen"; i !@f|]
 
-  method is_fullscreen : bool = m raw_js "isFullScreen" [||]
+    method on_leave_html_full_screen (f : (unit -> unit)) : unit =
+      m raw_js "on" [|to_js_str "leave-html-full-screen"; i !@f|]
 
-  method set_title s : unit = m raw_js "setTitle" [|to_js_str s|]
+    (* This callback needs to be object wrapped correctly *)
+    method on_app_command (f : (Events.event -> string -> unit)) : unit =
+      m raw_js "on" [|to_js_str "app-command"; i !@f|]
 
-  method title = m raw_js "getTitle" [||] |> Js.to_string
+    method on_page_title_updated (f : (Events.event -> unit)) : unit =
+      m raw_js "on" [|to_js_str "page-title-updated"; i !@f|]
 
-  method flash_frame b : unit =
-    if b then m raw_js "flashFrame" [|i true|]
-    else m raw_js "flashFrame" [|i false|]
-end
+    method web_contents : web_contents =
+      new web_contents (raw_js <!> "webContents")
+
+    method id : int = raw_js <!> "id"
+
+    (** Force closing the window, the unload and beforeunload event
+        won't be emitted for the web page, and close event will also not
+        be emitted for this window, but it guarantees the closed event
+        will be emitted.
+
+        You should only use this method when the renderer process (web
+        page) has crashed.*)
+    method destory : unit = m raw_js "destroy" [||]
+
+    (** Try to close the window, this has the same effect with user
+        manually clicking the close button of the window. The web page may
+        cancel the close though, see the close event.*)
+    method close : unit = m raw_js "close" [||]
+
+    method focus : unit = m raw_js "focus" [||]
+
+    method is_focused : bool = m raw_js "isFocused" [||]
+
+    method show : unit = m raw_js "show" [||]
+
+    method show_inactive : unit = m raw_js "showInactive" [||]
+
+    method hide : unit = m raw_js "hide" [||]
+
+    method is_visible : bool = m raw_js "isVisible" [||]
+
+    method maximize : unit = m raw_js "maximize" [||]
+
+    method unmaximize : unit = m raw_js "unmaximize" [||]
+
+    method is_maximized : bool = m raw_js "unmaximize" [||]
+
+    method minimize : unit = m raw_js "minimize" [||]
+
+    method set_fullscreen b : unit =
+      if b then m raw_js "setFullScreen" [|i true|]
+      else m raw_js "setFullScreen" [|i false|]
+
+    method is_fullscreen : bool = m raw_js "isFullScreen" [||]
+
+    method set_title s : unit = m raw_js "setTitle" [|to_js_str s|]
+
+    method title = m raw_js "getTitle" [||] |> Js.to_string
+
+    method flash_frame b : unit =
+      if b then m raw_js "flashFrame" [|i true|]
+      else m raw_js "flashFrame" [|i false|]
+  end
+
+  let all_windows () =
+    let h = require_module "browser-window" in
+    m h "getAllWindows" [||] |> Js.to_array
+    |> Array.map (fun existing -> new browser_window (Some existing))
+    |> Array.to_list
+
+  let focused_window () =
+    let h = require_module "browser-window" in
+    new browser_window (m h "getFocusedWindow" [||])
+
+  let from_id (j : int) =
+    let h = require_module "browser-window" in
+    new browser_window (m h "fromId" [|i j|])
 
 end
 
@@ -621,7 +691,6 @@ end
 
 module Protocol = struct
 end
-
 
 module Web_contents = struct
 end
