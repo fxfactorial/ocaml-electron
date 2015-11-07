@@ -24,6 +24,7 @@ module App = struct
       m raw_js "on" [|i "ready"; i !@f|]
 
   end
+
 end
 
 module Session = struct
@@ -107,10 +108,15 @@ module Browser_window = struct
     | Splash -> "splash"
     | Notification -> "notification"
 
+  let string_of_title_bar = function
+    | Default -> "default"
+    | Hidden -> "hidden"
+    | Hidden_inset -> "hidden-inset"
+
   (** Settings of web page's features *)
   type web_pref_t =
     { (** Whether node integration is enabled *)
-      node_integration : bool;
+      node_integration : bool option;
       (** Specifies a script that will be loaded before other scripts
           run in the page. This script will always have access to node APIs no
           matter whether node integration is turned on for the page, and the
@@ -126,40 +132,39 @@ module Browser_window = struct
       partition : string option;
       (** The default zoom factor of the page, 3.0 represents 300%. *)
       zoom_factor : float option;
-      javascript : bool;
+      javascript : bool option;
       (** When setting false, it will disable the same-origin policy
           (Usually using testing websites by people), and set
           allow_displaying_insecure_content and
           allow_running_insecure_content to true if these two options are
           not set by user. *)
-      web_security : bool;
+      web_security : bool option;
       (** Allow an https page to display content like images from http
           URLs. *)
-      allow_display_insecure_content : bool;
+      allow_display_insecure_content : bool option;
       (** Allow a https page to run JavaScript, CSS or plugins from
           http URLs. *)
-      allow_running_insecure_content : bool;
-      images : bool;
-      java : bool;
-      text_areas_are_resizable : bool;
-      webgl : bool;
-      web_audio : bool;
+      allow_running_insecure_content : bool option;
+      images : bool option;
+      java : bool option;
+      text_areas_are_resizable : bool option;
+      webgl : bool option;
+      web_audio : bool option;
       (** Whether plugins should be enabled. *)
-      plugins : bool;
-      experimental_features : bool;
-      experimental_canvas_features : bool;
-      overlay_scrollbars : bool;
-      overlay_fullscreen_video : bool;
-      shared_worker : bool;
+      plugins : bool option;
+      experimental_features : bool option;
+      experimental_canvas_features : bool option;
+      overlay_scrollbars : bool option;
+      overlay_fullscreen_video : bool option;
+      shared_worker : bool option;
       (** Whether the DirectWrite font rendering system on Windows is
           enabled. *)
-      direct_write : bool;
+      direct_write : bool option;
       (** Page would be forced to be always in visible or hidden state
           once set, instead of reflecting current window's
           visibility. Users can set it to true to prevent throttling of
           DOM timers. *)
-      page_visibility : bool; }
-
+      page_visibility : bool option; }
 
   type browser_opts =
     {(** Window's width. *)
@@ -167,68 +172,69 @@ module Browser_window = struct
       (** Window's height. *)
       height : int;
       (** Window's left offset from screen. *)
-      x_offset : int;
+      x_offset : int option;
       (** Window's top offset from screen *)
-      y_offset : int;
+      y_offset : int option;
       (** The width and height would be used as web page's size, which
           means the actual window's size will include window frame's size
           and be slightly larger. *)
-      use_content_size : bool;
+      use_content_size : bool option;
       (** Show window in the center of the screen. *)
-      center : bool;
+      center : bool option;
       (** Window's minimum width. *)
-      min_width: int;
+      min_width: int option;
       (** Window's minimum height *)
-      min_height: int;
+      min_height: int option;
       (** Window's maximum width. *)
-      max_width: int;
+      max_width: int option;
       (** Window's maximum height. *)
-      max_height : int;
+      max_height : int option;
       (** Whether window is resizable. *)
-      resizable : bool;
+      resizable : bool option;
       (** Whether the window should always stay on top of other windows. *)
-      always_on_top : bool;
+      always_on_top : bool option;
       (** Whether the window should show in fullscreen. When set to
           false the fullscreen button will be hidden or disabled on OS X. *)
-      fullscreen : bool;
+      fullscreen : bool option;
       (** Whether to show the window in taskbar. *)
-      skip_taskbar : bool;
+      skip_taskbar : bool option;
       (** The kiosk mode. *)
-      kiosk : bool;
+      kiosk : bool option;
       (** Default window title. *)
-      title : string;
-      (* icon : Electron.Native *)
+      title : string option;
+      (** The Icon for the application *)
+      icon : string option;
       (** Whether window should be shown when created. *)
-      show : bool;
+      show : bool option;
       (** Specify false to create a Frameless Window. *)
-      be_frameless : bool;
+      be_frameless : bool option;
       (** Whether the web view accepts a single mouse-down event that
           simultaneously activates the window. *)
-      accept_first_mouse : bool;
+      accept_first_mouse : bool option;
       (**  Whether to hide cursor when typing. *)
-      disable_auto_hide_cursor : bool;
+      disable_auto_hide_cursor : bool option;
       (** Auto hide the menu bar unless the Alt key is pressed. *)
-      auto_hide_menu_bar : bool;
+      auto_hide_menu_bar : bool option;
       (** Enable the window to be resized larger than screen. *)
-      enable_larger_than_screen : bool;
+      enable_larger_than_screen : bool option;
       (** Window's background color as Hexadecimal value, like #66CD00
           or #FFF. This is only implemented on Linux and Windows. *)
-      background_color : string;
+      background_color : string option;
       (** Forces using dark theme for the window, only works on some
           GTK+3 desktop environments. *)
-      dark_theme : bool;
+      dark_theme : bool option;
       (** Makes the window transparent. *)
-      transparent : bool;
+      transparent : bool option;
       (**  Specifies the type of the window, this only works on Linux *)
-      window_type : window_t;
+      window_type : window_t option;
       (** Uses the OS X's standard window instead of the textured
           window. *)
-      standard_window : bool;
+      standard_window : bool option;
       (** OS X - specifies the style of window title bar. This option
           is supported on OS X 10.10 Yosemite and newer. *)
-      title_bar_style : title_bar_t;
+      title_bar_style : title_bar_t option;
       (** Settings of web page's features. *)
-      web_preferences : web_pref_t; }
+      web_preferences : web_pref_t option; }
 
   type url_opts = { http_referrer : string;
                     user_agent : string;
@@ -251,260 +257,341 @@ module Browser_window = struct
        skip_taskbar = sk;
        kiosk = k;
        title = t;
-       (* icon = i *)
+       icon = ic;
        show = s;
        be_frameless = f;
+       accept_first_mouse = a_f_m;
+       disable_auto_hide_cursor = d_a_h_c;
+       auto_hide_menu_bar = a_h_m_b;
+       enable_larger_than_screen = e_l_t_s;
+       background_color = bg_color;
+       dark_theme = dt;
+       window_type = w_t;
+       standard_window = s_w;
+       title_bar_style = t_style;
+       web_preferences = w_pref;
       } =
-    obj_of_alist [("width", i w); ("height", i h); ("x", i x);
-                  ("y", i y); ("use-content-size", i ucs);
-                  ("center", i c); ("min-width", i min_w);
-                  ("min-height", i min_h); ("max-width", i max_w);
-                  ("max-height", i max_h); ("resizable", i r);
-                  ("always-on-top", i a_o_t); ("fullscreen", i f_screen);
-                  ("skip-taskbar", i sk); ("kiosk", i k);
-                  ("title", to_js_str t); ("show", i s); ("frame", i f);
-                 ]
+    let extract key = function None -> [] | Some g -> [(key, i g)] in
+    let extract_str key = function None -> [] | Some g -> [(key, to_js_str g)] in
+    let extract_win key = function
+      | None -> []
+      | Some win -> [(key, to_js_str (string_of_window win))]
+    in
+    let extract_title key = function
+      | None -> []
+      | Some t_bar -> [(key, to_js_str (string_of_title_bar t_bar))]
+    in
+    let extract_web_prefs key = function
+      | None -> []
+      | Some {node_integration = n; preload = p;
+              partition = par; zoom_factor = z;
+              javascript = js; web_security = ws;
+              allow_display_insecure_content = a_d_i_c;
+              allow_running_insecure_content = a_r_i_c;
+              images = i; java = j; text_areas_are_resizable = t_a_a_r;
+              webgl = gl; web_audio = w_a; plugins = pl;
+              experimental_features = e_f;
+              experimental_canvas_features = e_c_f;
+              overlay_scrollbars = o_s; overlay_fullscreen_video = o_f_v;
+              shared_worker = s_w; direct_write = dw;
+              page_visibility = pv} ->
+        [extract "node-integration" n; extract_str "preload" p;
+         extract_str "partition" par; extract "zoom-factor" z;
+         extract "javascript" js; extract "web-security" ws;
+         extract "allow-displaying-insecure-content" a_d_i_c;
+         extract "allow-running-insecure-content" a_r_i_c;
+         extract "images" i; extract "java" j;
+         extract "text-areas-are-resizable" t_a_a_r; extract "webgl" gl;
+         extract "webaudio" w_a; extract "plugins" pl;
+         extract "experimental-features" e_f;
+         extract "experimental-canvas-features" e_c_f;
+         extract "overlay-scrollbars" o_s;
+         extract "overlay-fullscreen-video" o_f_v; extract "shared-worker" s_w;
+         extract "direct-write" dw; extract "page-visibility" pv]
+        |> List.flatten
+    in
+    [[("width", i w); ("height", i h)];
+     extract "x" x; extract "y" y; extract "use-content-size" ucs;
+     extract "center" c; extract "min-height" min_h; extract "min-width" min_w;
+     extract "max-height" max_h; extract "max-width" max_w;
+     extract "resizable" r; extract "always-on-top" a_o_t;
+     extract "fullscreen" f_screen; extract "skip-taskbar" sk;
+     extract "kiosk" k; extract_str "title" t; extract "show" s;
+     extract "frame" f; extract "accept-first-mouse" a_f_m;
+     extract "disable-auto-hide-cursor" d_a_h_c; extract "icon" ic;
+     extract "auto-hide-menu-bar" a_h_m_b;
+     extract "enable-larger-than-screen" e_l_t_s;
+     extract "background-color" bg_color;
+     extract "dark-theme" dt; extract_win "type" w_t;
+     extract "standard-window" s_w; extract_title "title-bar-style" t_style;
+     extract_web_prefs "web-preferences" w_pref]
+    |> List.flatten |> obj_of_alist
     |> stringify
 
-  class web_contents raw_js = object
+  let simple_web_prefs =
+    {node_integration = Some true; preload = None; partition = None;
+     zoom_factor = None; javascript = Some true; web_security = Some true;
+     allow_running_insecure_content = None;
+     allow_display_insecure_content = None;
+     images = Some true; java = Some false; text_areas_are_resizable = Some true;
+     webgl = Some false; web_audio = Some false; plugins = Some false;
+     experimental_features = Some true; experimental_canvas_features = Some false;
+     overlay_scrollbars = None; overlay_fullscreen_video = None;
+     shared_worker = None; direct_write = None; page_visibility = None}
 
-    method on_did_finish_load (f : (unit -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "did-finish-load"); i !@f|]
+  let simple_b_win_opts w h =
+    {width = w; height = h; x_offset = None; y_offset = None;
+     use_content_size = None; center = None; min_width = None;
+     min_height = None; max_width = None; max_height = None;
+     resizable = Some true; always_on_top = Some false;
+     fullscreen = Some false; skip_taskbar = None;
+     kiosk = None; title = None; show = Some true;
+     be_frameless = None; accept_first_mouse = None;
+     disable_auto_hide_cursor = None; auto_hide_menu_bar = None;
+     enable_larger_than_screen = None; icon = None;
+     background_color = None; dark_theme = None;
+     transparent = None; window_type = None; standard_window = None;
+     title_bar_style = None; web_preferences = Some simple_web_prefs}
 
-    method on_did_fail_load
-        (f : (Events.event -> int -> string -> string -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "did-fail-load"); i !@f|]
+class web_contents raw_js = object
 
-    method on_did_frame_finish_load
-        (f : (Events.event -> bool -> unit)) : unit =
-      m raw_js "on" [|i (Js.string "did-frame-finish-load"); i !@f|]
+  method on_did_finish_load (f : (unit -> unit)) : unit =
+    m raw_js "on" [|i (Js.string "did-finish-load"); i !@f|]
 
-    (* method on_did_start_loading :  *)
+  method on_did_fail_load
+      (f : (Events.event -> int -> string -> string -> unit)) : unit =
+    m raw_js "on" [|i (Js.string "did-fail-load"); i !@f|]
 
-    (* method on_did_stop_loading :  *)
+  method on_did_frame_finish_load
+      (f : (Events.event -> bool -> unit)) : unit =
+    m raw_js "on" [|i (Js.string "did-frame-finish-load"); i !@f|]
 
-    (* method on_did_get_response_details:  *)
+  (* method on_did_start_loading :  *)
 
-    (* method on_did_get_redirect_request :  *)
+  (* method on_did_stop_loading :  *)
 
-    (* method on_dom_ready :  *)
+  (* method on_did_get_response_details:  *)
 
-    (* method on_page_favicon_updated :  *)
+  (* method on_did_get_redirect_request :  *)
 
-    (* method on_new_window  *)
+  (* method on_dom_ready :  *)
 
-    (* method on_will_navigate  *)
+  (* method on_page_favicon_updated :  *)
 
-    (* method on_crashed  *)
+  (* method on_new_window  *)
 
-    (* method on_plugin_crashed *)
+  (* method on_will_navigate  *)
 
-    (* method on_destroyed:  *)
+  (* method on_crashed  *)
 
-    (* method on_devtools_opened *)
+  (* method on_plugin_crashed *)
 
-    (* method on_devtools_closed : *)
+  (* method on_destroyed:  *)
 
-    (* method on_devtools_focused  *)
+  (* method on_devtools_opened *)
 
-    (* method on_login  *)
+  (* method on_devtools_closed : *)
 
-    method session : Session.session =
-      new Session.session raw_js <!> "session"
+  (* method on_devtools_focused  *)
 
-    method load_url ?opts url : unit =
-      match opts with
-      | None -> m raw_js "loadUrl" [|i (Js.string url)|]
-      | Some {http_referrer = r;
-              user_agent = a;
-              extra_headers = h} ->
-        let obj = obj_of_alist [("httpReferrer", r);
-                                ("userAgent", a);
-                                ("extraHeaders", String.concat "\n" h)] in
-        m raw_js "loadUrl" [|i (Js.string url); i obj|]
+  (* method on_login  *)
 
-    method get_url =
-      m raw_js "getUrl" [||] |> Js.to_string
+  method session : Session.session =
+    new Session.session raw_js <!> "session"
 
-    method get_title =
-      m raw_js "getTitle" [||] |> Js.to_string
+  method load_url ?opts url : unit =
+    match opts with
+    | None -> m raw_js "loadUrl" [|i (Js.string url)|]
+    | Some {http_referrer = r;
+            user_agent = a;
+            extra_headers = h} ->
+      let obj = obj_of_alist [("httpReferrer", r);
+                              ("userAgent", a);
+                              ("extraHeaders", String.concat "\n" h)] in
+      m raw_js "loadUrl" [|i (Js.string url); i obj|]
 
-    method is_loading =
-      m raw_js "isLoading" [||] |> Js.to_bool
+  method get_url =
+    m raw_js "getUrl" [||] |> Js.to_string
 
-    method is_waiting_for_response =
-      m raw_js "isWaitingForResponse" [||] |> Js.to_bool
+  method get_title =
+    m raw_js "getTitle" [||] |> Js.to_string
 
-    method stop : unit =
-      m raw_js "stop" [||]
+  method is_loading =
+    m raw_js "isLoading" [||] |> Js.to_bool
 
-    method reload : unit =
-      m raw_js "reload" [||]
+  method is_waiting_for_response =
+    m raw_js "isWaitingForResponse" [||] |> Js.to_bool
 
-    method reload_ignoring_cache : unit =
-      m raw_js "reloadIgnoringCache" [||]
+  method stop : unit =
+    m raw_js "stop" [||]
 
-    method can_go_back =
-      m raw_js "canGoBack" [||] |> Js.to_bool
+  method reload : unit =
+    m raw_js "reload" [||]
 
-    method can_go_forward =
-      m raw_js "canGoForward" [||] |> Js.to_bool
+  method reload_ignoring_cache : unit =
+    m raw_js "reloadIgnoringCache" [||]
 
-    method can_go_to_offset (j : int) =
-      m raw_js "canGoToOffset" [|i j|] |> Js.to_bool
+  method can_go_back =
+    m raw_js "canGoBack" [||] |> Js.to_bool
 
-    method clear_history : unit =
-      m raw_js "clearHistory" [||]
+  method can_go_forward =
+    m raw_js "canGoForward" [||] |> Js.to_bool
 
-    method go_back : unit =
-      m raw_js "goBack" [||]
+  method can_go_to_offset (j : int) =
+    m raw_js "canGoToOffset" [|i j|] |> Js.to_bool
 
-    method go_forward : unit =
-      m raw_js "goForward" [||]
+  method clear_history : unit =
+    m raw_js "clearHistory" [||]
 
-    method go_to_index (j : int) : unit =
-      m raw_js "goToIndex" [|i j|]
+  method go_back : unit =
+    m raw_js "goBack" [||]
 
-    method go_to_offset (j : int) : unit =
-      m raw_js "goToOffset" [|i j|]
+  method go_forward : unit =
+    m raw_js "goForward" [||]
 
-    method is_crashed =
-      m raw_js "isCrashed" [||] |> Js.to_bool
+  method go_to_index (j : int) : unit =
+    m raw_js "goToIndex" [|i j|]
 
-    method set_user_agent (s : string) : unit =
-      m raw_js "setUserAgent" [|i (Js.string s)|]
+  method go_to_offset (j : int) : unit =
+    m raw_js "goToOffset" [|i j|]
 
-    method get_user_agent =
-      m raw_js "getUserAgent" [||] |> Js.to_string
+  method is_crashed =
+    m raw_js "isCrashed" [||] |> Js.to_bool
 
-    method insert_css (css : string) : unit =
-      m raw_js "insertCss" [|i (Js.string css)|]
+  method set_user_agent (s : string) : unit =
+    m raw_js "setUserAgent" [|i (Js.string s)|]
 
-    method execute_javascript
-        ?(user_gesture : bool option)
-        (code : string) : unit =
-      match user_gesture with
-      | None -> m raw_js "executeJavaScript" [|i (Js.string code)|]
-      | Some b -> m raw_js "executeJavaScript" [|i (Js.string code); i b|]
+  method get_user_agent =
+    m raw_js "getUserAgent" [||] |> Js.to_string
 
-    method set_audio_muted (b : bool) : unit =
-      m raw_js "setAudioMuted" [|i b|]
+  method insert_css (css : string) : unit =
+    m raw_js "insertCss" [|i (Js.string css)|]
 
-    method is_audio_muted : bool =
-      m raw_js "isAudioMuted" [||] |> Js.to_bool
+  method execute_javascript
+      ?(user_gesture : bool option)
+      (code : string) : unit =
+    match user_gesture with
+    | None -> m raw_js "executeJavaScript" [|i (Js.string code)|]
+    | Some b -> m raw_js "executeJavaScript" [|i (Js.string code); i b|]
 
-    method undo : unit =
-      m raw_js "undo" [||]
+  method set_audio_muted (b : bool) : unit =
+    m raw_js "setAudioMuted" [|i b|]
 
-    method redo : unit =
-      m raw_js "redo" [||]
+  method is_audio_muted : bool =
+    m raw_js "isAudioMuted" [||] |> Js.to_bool
 
-    method cut : unit =
-      m raw_js "cut" [||]
+  method undo : unit =
+    m raw_js "undo" [||]
 
-    method copy : unit =
-      m raw_js "copy" [||]
+  method redo : unit =
+    m raw_js "redo" [||]
 
-    method paste : unit =
-      m raw_js "paste" [||]
+  method cut : unit =
+    m raw_js "cut" [||]
 
-    method paste_and_match_style : unit =
-      m raw_js "pasteAndMatchStyle" [||]
+  method copy : unit =
+    m raw_js "copy" [||]
 
-    method delete : unit =
-      m raw_js "delete" [||]
+  method paste : unit =
+    m raw_js "paste" [||]
 
-    method select_all : unit =
-      m raw_js "selectAll" [||]
+  method paste_and_match_style : unit =
+    m raw_js "pasteAndMatchStyle" [||]
 
-    method unselect : unit =
-      m raw_js "unselect" [||]
+  method delete : unit =
+    m raw_js "delete" [||]
 
-    method replace (s : string) : unit =
-      m raw_js "replace" [|i (Js.string s)|]
+  method select_all : unit =
+    m raw_js "selectAll" [||]
 
-  end
+  method unselect : unit =
+    m raw_js "unselect" [||]
 
-  class browser_window ?(remote=false) ?opts existing = object
+  method replace (s : string) : unit =
+    m raw_js "replace" [|i (Js.string s)|]
 
-    val raw_js =
-      let result = match opts with
-        | None -> ""
-        | Some o -> "(" ^ of_opts o ^ ")"
-      in
-      match existing with
-      | None ->
-        (match remote with
-         | false ->
-           (Printf.sprintf
-              "new (require(\"browser-window\"))%s" result)
-           |> Js.Unsafe.eval_string
-         |true ->
-           (Printf.sprintf
-              "new (require(\"remote\").require(\"browser-window\"))%s" result)
-           |> Js.Unsafe.eval_string)
-      | Some e -> e
+end
 
-    method load_url (s : string) : unit = m raw_js "loadUrl" [|i (Js.string s)|]
+class browser_window ?(remote=false) ?opts existing = object
 
-    method open_dev_tools : unit = m raw_js "openDevTools" [||]
+  val raw_js =
+    let result = match opts with
+      | None -> ""
+      | Some o -> "(" ^ of_opts o ^ ")"
+    in
+    match existing with
+    | None ->
+      (match remote with
+       | false ->
+         (Printf.sprintf
+            "new (require(\"browser-window\"))%s" result)
+         |> Js.Unsafe.eval_string
+       |true ->
+         (Printf.sprintf
+            "new (require(\"remote\").require(\"browser-window\"))%s" result)
+         |> Js.Unsafe.eval_string)
+    | Some e -> e
 
-    method on_closed (f : (unit -> unit)) : unit =
-      m raw_js "on" [|i "closed"; i !@f|]
+  method load_url (s : string) : unit = m raw_js "loadUrl" [|i (Js.string s)|]
 
-    method web_contents : web_contents =
-      new web_contents (raw_js <!> "webContents")
+  method open_dev_tools : unit = m raw_js "openDevTools" [||]
 
-    method id : int = raw_js <!> "id"
+  method on_closed (f : (unit -> unit)) : unit =
+    m raw_js "on" [|i "closed"; i !@f|]
 
-    (** Force closing the window, the unload and beforeunload event
-        won't be emitted for the web page, and close event will also not
-        be emitted for this window, but it guarantees the closed event
-        will be emitted.
+  method web_contents : web_contents =
+    new web_contents (raw_js <!> "webContents")
 
-        You should only use this method when the renderer process (web
-        page) has crashed.*)
-    method destory : unit = m raw_js "destroy" [||]
+  method id : int = raw_js <!> "id"
 
-    (** Try to close the window, this has the same effect with user
-        manually clicking the close button of the window. The web page may
-        cancel the close though, see the close event.*)
-    method close : unit = m raw_js "close" [||]
+  (** Force closing the window, the unload and beforeunload event
+      won't be emitted for the web page, and close event will also not
+      be emitted for this window, but it guarantees the closed event
+      will be emitted.
 
-    method focus : unit = m raw_js "focus" [||]
+      You should only use this method when the renderer process (web
+      page) has crashed.*)
+  method destory : unit = m raw_js "destroy" [||]
 
-    method is_focused : bool = m raw_js "isFocused" [||]
+  (** Try to close the window, this has the same effect with user
+      manually clicking the close button of the window. The web page may
+      cancel the close though, see the close event.*)
+  method close : unit = m raw_js "close" [||]
 
-    method show : unit = m raw_js "show" [||]
+  method focus : unit = m raw_js "focus" [||]
 
-    method show_inactive : unit = m raw_js "showInactive" [||]
+  method is_focused : bool = m raw_js "isFocused" [||]
 
-    method hide : unit = m raw_js "hide" [||]
+  method show : unit = m raw_js "show" [||]
 
-    method is_visible : bool = m raw_js "isVisible" [||]
+  method show_inactive : unit = m raw_js "showInactive" [||]
 
-    method maximize : unit = m raw_js "maximize" [||]
+  method hide : unit = m raw_js "hide" [||]
 
-    method unmaximize : unit = m raw_js "unmaximize" [||]
+  method is_visible : bool = m raw_js "isVisible" [||]
 
-    method is_maximized : bool = m raw_js "unmaximize" [||]
+  method maximize : unit = m raw_js "maximize" [||]
 
-    method minimize : unit = m raw_js "minimize" [||]
+  method unmaximize : unit = m raw_js "unmaximize" [||]
 
-    method set_fullscreen b : unit =
-      if b then m raw_js "setFullScreen" [|i true|]
-      else m raw_js "setFullScreen" [|i false|]
+  method is_maximized : bool = m raw_js "unmaximize" [||]
 
-    method is_fullscreen : bool = m raw_js "isFullScreen" [||]
+  method minimize : unit = m raw_js "minimize" [||]
 
-    method set_title s : unit = m raw_js "setTitle" [|to_js_str s|]
+  method set_fullscreen b : unit =
+    if b then m raw_js "setFullScreen" [|i true|]
+    else m raw_js "setFullScreen" [|i false|]
 
-    method title = m raw_js "getTitle" [||] |> Js.to_string
+  method is_fullscreen : bool = m raw_js "isFullScreen" [||]
 
-    method flash_frame b : unit =
-      if b then m raw_js "flashFrame" [|i true|]
-      else m raw_js "flashFrame" [|i false|]
-  end
+  method set_title s : unit = m raw_js "setTitle" [|to_js_str s|]
+
+  method title = m raw_js "getTitle" [||] |> Js.to_string
+
+  method flash_frame b : unit =
+    if b then m raw_js "flashFrame" [|i true|]
+    else m raw_js "flashFrame" [|i false|]
+end
 
 end
 
