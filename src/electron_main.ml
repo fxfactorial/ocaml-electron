@@ -277,11 +277,9 @@ module Browser_window = struct
           |> Js.Unsafe.eval_string)
       | Some e -> e
 
-    method load_url (s : string) : unit =
-      m raw_js "loadUrl" [|i (Js.string s)|]
+    method load_url (s : string) : unit = m raw_js "loadUrl" [|i (Js.string s)|]
 
-    method open_dev_tools : unit =
-      m raw_js "openDevTools" [||]
+    method open_dev_tools : unit = m raw_js "openDevTools" [||]
 
     method on_closed (f : (unit -> unit)) : unit =
       m raw_js "on" [|i "closed"; i !@f|]
@@ -289,6 +287,55 @@ module Browser_window = struct
     method web_contents : web_contents =
       new web_contents (raw_js <!> "webContents")
 
+    method id : int = raw_js <!> "id"
+
+    (** Force closing the window, the unload and beforeunload event
+        won't be emitted for the web page, and close event will also not
+        be emitted for this window, but it guarantees the closed event
+        will be emitted.
+
+        You should only use this method when the renderer process (web
+        page) has crashed.*)
+    method destory : unit = m raw_js "destroy" [||]
+
+    (** Try to close the window, this has the same effect with user
+        manually clicking the close button of the window. The web page may
+        cancel the close though, see the close event.*)
+    method close : unit = m raw_js "close" [||]
+
+    method focus : unit = m raw_js "focus" [||]
+
+    method is_focused : bool = m raw_js "isFocused" [||]
+
+    method show : unit = m raw_js "show" [||]
+
+    method show_inactive : unit = m raw_js "showInactive" [||]
+
+    method hide : unit = m raw_js "hide" [||]
+
+    method is_visible : bool = m raw_js "isVisible" [||]
+
+    method maximize : unit = m raw_js "maximize" [||]
+
+    method unmaximize : unit = m raw_js "unmaximize" [||]
+
+    method is_maximized : bool = m raw_js "unmaximize" [||]
+
+    method minimize : unit = m raw_js "minimize" [||]
+
+    method set_fullscreen b : unit =
+      if b then m raw_js "setFullScreen" [|i true|]
+      else m raw_js "setFullScreen" [|i false|]
+
+    method is_fullscreen : bool = m raw_js "isFullScreen" [||]
+
+    method set_title s : unit = m raw_js "setTitle" [|to_js_str s|]
+
+    method title = m raw_js "getTitle" [||] |> Js.to_string
+
+    method flash_frame b : unit =
+      if b then m raw_js "flashFrame" [|i true|]
+      else m raw_js "flashFrame" [|i false|]
   end
 
 end
