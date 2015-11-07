@@ -115,7 +115,7 @@ module Browser_window = struct
           run in the page. This script will always have access to node APIs no
           matter whether node integration is turned on for the page, and the
           path of preload script has to be absolute path.*)
-      preload : string;
+      preload : string option;
       (** Sets the session used by the page. If partition starts with
           persist:, the page will use a persistent session available to
           all pages in the app with the same partition. if there is no
@@ -125,7 +125,7 @@ module Browser_window = struct
           app will be used. *)
       partition : string option;
       (** The default zoom factor of the page, 3.0 represents 300%. *)
-      zoom_factor : float;
+      zoom_factor : float option;
       javascript : bool;
       (** When setting false, it will disable the same-origin policy
           (Usually using testing websites by people), and set
@@ -161,35 +161,74 @@ module Browser_window = struct
       page_visibility : bool; }
 
 
-  type browser_opts = { width: int;
-                        height : int;
-                        x_offset : int;
-                        y_offset : int;
-                        use_content_size : bool;
-                        center : bool;
-                        min_width: int;
-                        min_height: int;
-                        max_width: int;
-                        max_height : int;
-                        resizable : bool;
-                        always_on_top : bool;
-                        fullscreen : bool;
-                        skip_taskbar : bool;
-                        kiosk : bool;
-                        title : string;
-                        (* icon : Electron.Native *)
-                        show : bool;
-                        frame : bool;
-                        accept_first_mouse : bool;
-                        disable_auto_hide_bar : bool;
-                        enable_larger_than_screen : bool;
-                        background_color : string;
-                        dark_theme : bool;
-                        transparent : bool;
-                        window_type : window_t;
-                        standard_window : bool;
-                        title_bar_style : title_bar_t;
-                        web_preferences : web_pref_t; }
+  type browser_opts =
+    {(** Window's width. *)
+      width: int;
+      (** Window's height. *)
+      height : int;
+      (** Window's left offset from screen. *)
+      x_offset : int;
+      (** Window's top offset from screen *)
+      y_offset : int;
+      (** The width and height would be used as web page's size, which
+          means the actual window's size will include window frame's size
+          and be slightly larger. *)
+      use_content_size : bool;
+      (** Show window in the center of the screen. *)
+      center : bool;
+      (** Window's minimum width. *)
+      min_width: int;
+      (** Window's minimum height *)
+      min_height: int;
+      (** Window's maximum width. *)
+      max_width: int;
+      (** Window's maximum height. *)
+      max_height : int;
+      (** Whether window is resizable. *)
+      resizable : bool;
+      (** Whether the window should always stay on top of other windows. *)
+      always_on_top : bool;
+      (** Whether the window should show in fullscreen. When set to
+          false the fullscreen button will be hidden or disabled on OS X. *)
+      fullscreen : bool;
+      (** Whether to show the window in taskbar. *)
+      skip_taskbar : bool;
+      (** The kiosk mode. *)
+      kiosk : bool;
+      (** Default window title. *)
+      title : string;
+      (* icon : Electron.Native *)
+      (** Whether window should be shown when created. *)
+      show : bool;
+      (** Specify false to create a Frameless Window. *)
+      be_frameless : bool;
+      (** Whether the web view accepts a single mouse-down event that
+          simultaneously activates the window. *)
+      accept_first_mouse : bool;
+      (**  Whether to hide cursor when typing. *)
+      disable_auto_hide_cursor : bool;
+      (** Auto hide the menu bar unless the Alt key is pressed. *)
+      auto_hide_menu_bar : bool;
+      (** Enable the window to be resized larger than screen. *)
+      enable_larger_than_screen : bool;
+      (** Window's background color as Hexadecimal value, like #66CD00
+          or #FFF. This is only implemented on Linux and Windows. *)
+      background_color : string;
+      (** Forces using dark theme for the window, only works on some
+          GTK+3 desktop environments. *)
+      dark_theme : bool;
+      (** Makes the window transparent. *)
+      transparent : bool;
+      (**  Specifies the type of the window, this only works on Linux *)
+      window_type : window_t;
+      (** Uses the OS X's standard window instead of the textured
+          window. *)
+      standard_window : bool;
+      (** OS X - specifies the style of window title bar. This option
+          is supported on OS X 10.10 Yosemite and newer. *)
+      title_bar_style : title_bar_t;
+      (** Settings of web page's features. *)
+      web_preferences : web_pref_t; }
 
   type url_opts = { http_referrer : string;
                     user_agent : string;
@@ -197,8 +236,34 @@ module Browser_window = struct
 
   let of_opts
       {width = w;
-       height = h} =
-    obj_of_alist [("width", i w); ("height", i h)]
+       height = h;
+       x_offset = x;
+       y_offset = y;
+       use_content_size = ucs;
+       center = c;
+       min_height = min_h;
+       min_width = min_w;
+       max_width = max_w;
+       max_height = max_h;
+       resizable = r;
+       always_on_top = a_o_t;
+       fullscreen = f_screen;
+       skip_taskbar = sk;
+       kiosk = k;
+       title = t;
+       (* icon = i *)
+       show = s;
+       be_frameless = f;
+      } =
+    obj_of_alist [("width", i w); ("height", i h); ("x", i x);
+                  ("y", i y); ("use-content-size", i ucs);
+                  ("center", i c); ("min-width", i min_w);
+                  ("min-height", i min_h); ("max-width", i max_w);
+                  ("max-height", i max_h); ("resizable", i r);
+                  ("always-on-top", i a_o_t); ("fullscreen", i f_screen);
+                  ("skip-taskbar", i sk); ("kiosk", i k);
+                  ("title", to_js_str t); ("show", i s); ("frame", i f);
+                 ]
     |> stringify
 
   class web_contents raw_js = object
@@ -357,7 +422,6 @@ module Browser_window = struct
 
     method replace (s : string) : unit =
       m raw_js "replace" [|i (Js.string s)|]
-
 
   end
 
