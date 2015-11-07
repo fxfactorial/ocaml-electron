@@ -84,8 +84,112 @@ end
 
 module Browser_window = struct
 
+  type window_t = Desktop | Dock | Toolbar | Splash | Notification
+
+  (** OS X - specifies the style of window title bar. This option is
+      supported on OS X 10.10 Yosemite and newer. *)
+  type title_bar_t =
+    (** standard gray opaque Mac title bar. *)
+      Default
+    (** results in a hidden title bar and a full size content window,
+        yet the title bar still has the standard window controls ("traffic
+        lights") in the top left. *)
+    | Hidden
+    (** results in a hidden title bar with an alternative look where
+        the traffic light buttons are slightly more inset from the window
+        edge. *)
+    | Hidden_inset
+
+  let string_of_window = function
+    | Desktop -> "desktop"
+    | Dock -> "dock"
+    | Toolbar -> "toolbar"
+    | Splash -> "splash"
+    | Notification -> "notification"
+
+  (** Settings of web page's features *)
+  type web_pref_t =
+    { (** Whether node integration is enabled *)
+      node_integration : bool;
+      (** Specifies a script that will be loaded before other scripts
+          run in the page. This script will always have access to node APIs no
+          matter whether node integration is turned on for the page, and the
+          path of preload script has to be absolute path.*)
+      preload : string;
+      (** Sets the session used by the page. If partition starts with
+          persist:, the page will use a persistent session available to
+          all pages in the app with the same partition. if there is no
+          persist: prefix, the page will use an in-memory session. By
+          assigning the same partition, multiple pages can share the same
+          session. If the partition is None then default session of the
+          app will be used. *)
+      partition : string option;
+      (** The default zoom factor of the page, 3.0 represents 300%. *)
+      zoom_factor : float;
+      javascript : bool;
+      (** When setting false, it will disable the same-origin policy
+          (Usually using testing websites by people), and set
+          allow_displaying_insecure_content and
+          allow_running_insecure_content to true if these two options are
+          not set by user. *)
+      web_security : bool;
+      (** Allow an https page to display content like images from http
+          URLs. *)
+      allow_display_insecure_content : bool;
+      (** Allow a https page to run JavaScript, CSS or plugins from
+          http URLs. *)
+      allow_running_insecure_content : bool;
+      images : bool;
+      java : bool;
+      text_areas_are_resizable : bool;
+      webgl : bool;
+      web_audio : bool;
+      (** Whether plugins should be enabled. *)
+      plugins : bool;
+      experimental_features : bool;
+      experimental_canvas_features : bool;
+      overlay_scrollbars : bool;
+      overlay_fullscreen_video : bool;
+      shared_worker : bool;
+      (** Whether the DirectWrite font rendering system on Windows is
+          enabled. *)
+      direct_write : bool;
+      (** Page would be forced to be always in visible or hidden state
+          once set, instead of reflecting current window's
+          visibility. Users can set it to true to prevent throttling of
+          DOM timers. *)
+      page_visibility : bool; }
+
+
   type browser_opts = { width: int;
-                        height : int; }
+                        height : int;
+                        x_offset : int;
+                        y_offset : int;
+                        use_content_size : bool;
+                        center : bool;
+                        min_width: int;
+                        min_height: int;
+                        max_width: int;
+                        max_height : int;
+                        resizable : bool;
+                        always_on_top : bool;
+                        fullscreen : bool;
+                        skip_taskbar : bool;
+                        kiosk : bool;
+                        title : string;
+                        (* icon : Electron.Native *)
+                        show : bool;
+                        frame : bool;
+                        accept_first_mouse : bool;
+                        disable_auto_hide_bar : bool;
+                        enable_larger_than_screen : bool;
+                        background_color : string;
+                        dark_theme : bool;
+                        transparent : bool;
+                        window_type : window_t;
+                        standard_window : bool;
+                        title_bar_style : title_bar_t;
+                        web_preferences : web_pref_t; }
 
   type url_opts = { http_referrer : string;
                     user_agent : string;
@@ -267,14 +371,14 @@ module Browser_window = struct
       match existing with
       | None ->
         (match remote with
-        | false ->
-          (Printf.sprintf
-             "new (require(\"browser-window\"))%s" result)
-          |> Js.Unsafe.eval_string
-        |true ->
-          (Printf.sprintf
-             "new (require(\"remote\").require(\"browser-window\"))%s" result)
-          |> Js.Unsafe.eval_string)
+         | false ->
+           (Printf.sprintf
+              "new (require(\"browser-window\"))%s" result)
+           |> Js.Unsafe.eval_string
+         |true ->
+           (Printf.sprintf
+              "new (require(\"remote\").require(\"browser-window\"))%s" result)
+           |> Js.Unsafe.eval_string)
       | Some e -> e
 
     method load_url (s : string) : unit = m raw_js "loadUrl" [|i (Js.string s)|]

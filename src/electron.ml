@@ -5,6 +5,9 @@ open Nodejs
 
 
 module Native_image = struct
+
+  class native_image = object end
+
 end
 
 (** The clipboard module provides methods to perform copy and paste
