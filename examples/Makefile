@@ -1,13 +1,13 @@
 # pkgs := nodejs,socket_io,express
 
-pkgs := electron
+pkgs := electron.main_process
 
 # Do not use it breaks the script, very odd!
-define colorecho
-      @tput setaf 6
-      @echo $1
-      @tput sgr0
-endef
+# define colorecho
+#       @tput setaf 6
+#       @echo $1
+#       @tput sgr0
+# endef
 
 run:all clean
 	electron .

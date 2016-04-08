@@ -318,7 +318,7 @@ module Browser_window = struct
      extract "fullscreen" f_screen; extract "skip-taskbar" sk;
      extract "kiosk" k; extract_str "title" t; extract "show" s;
      extract "frame" f; extract "accept-first-mouse" a_f_m;
-     extract "disable-auto-hide-cursor" d_a_h_c; extract "icon" ic;
+     extract "disable-auto-hide-cursor" d_a_h_c; extract_str "icon" ic;
      extract "auto-hide-menu-bar" a_h_m_b;
      extract "enable-larger-than-screen" e_l_t_s;
      extract "background-color" bg_color;

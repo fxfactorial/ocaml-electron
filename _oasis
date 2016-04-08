@@ -1,6 +1,7 @@
+# -*- conf -*-
 OASISFormat: 0.4
 Name:        electron
-Version:     0.1
+Version:     0.1.0
 Synopsis:    js_of_ocaml bindings for electron
 Authors:     Edgar Aroutiounian <edgar.factorial@gmail.com>
 Maintainers: Edgar Aroutiounian <edgar.factorial@gmail.com>
