@@ -1,3 +1,5 @@
+open Js_of_ocaml
+
 (** These modules are allowed in use for both the main process and
     render processes of electron *)
 
@@ -13,6 +15,8 @@ end
 (** The clipboard module provides methods to perform copy and paste
     operations.  *)
 module Clipboard = struct
+
+  open Bindings_utils
 
   class clipboard = object
 
@@ -76,6 +80,8 @@ module Crash_reporter = struct
                    correctly and nested objects are not supported. *)
                extra : Js.Unsafe.any; }
 
+open Bindings_utils
+
   let of_opts
       {product_name = p_name;
        company_name = c_name;
@@ -118,16 +124,18 @@ end
 
 module Screen = struct
 
+  open Bindings_utils
+
   class screen = object
 
     val raw_js = require_module "screen"
 
     method on_display_added
-        (f : (Events.event -> Js.Unsafe.any -> unit)) : unit =
+        (f : (Events.event_emitter -> Js.Unsafe.any -> unit)) : unit =
       m raw_js "on" [|i (Js.string "display-added"); i !@f|]
 
     method on_display_removed
-        (f : (Events.event -> Js.Unsafe.any -> unit)) : unit =
+        (f : (Events.event_emitter -> Js.Unsafe.any -> unit)) : unit =
       m raw_js "on" [|i (Js.string "display-removed"); i !@f|]
 
     (** Emitted when one or more metrics change in a display. The
@@ -135,7 +143,7 @@ module Screen = struct
         changes. Possible changes are bounds, workArea, scaleFactor
         and rotation.*)
     method on_display_metrics_changed
-      (f : (Events.event ->
+      (f : (Events.event_emitter ->
             Js.Unsafe.any ->
             string Js.js_array-> unit)) : unit =
       m raw_js "on" [|i (Js.string "display-metrics-changed"); i !@f|]
@@ -151,6 +159,8 @@ end
 (** The shell module provides functions related to desktop
     integration.*)
 module Shell = struct
+
+  open Bindings_utils
 
   class shell = object
 

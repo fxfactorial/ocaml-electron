@@ -1,9 +1,12 @@
 (** These are modules mainly intended for usage from the main
     process *)
 
+open Js_of_ocaml
 open Nodejs
 
 module App = struct
+
+  open Bindings_utils
 
   class app = object
     val raw_js = require_module "app"
@@ -28,6 +31,8 @@ module App = struct
 end
 
 module Session = struct
+
+  open Bindings_utils
 
   class cookies raw_js = object
 
@@ -56,9 +61,11 @@ module Session = struct
       raw_js <!> "session" |> Js.to_bool
 
     method expiration_date =
-      raw_js <!> "expirationDate" |> Js.to_float
+      raw_js <!> "expirationDate" |> Js.to_string |> Float.of_string
 
   end
+
+  type error = string
 
   type details = {url : string;
                   name : string;
@@ -66,17 +73,17 @@ module Session = struct
                   path : string;
                   secure : bool;
                   session : bool;
-                  callback : (Error.error -> cookies -> unit);
-                  error : Error.error;
+                  callback : (error -> cookies -> unit);
+                  error : error;
                   cookies : cookies array; }
 
   class download_item = object end
 
-  class session raw_js = object
+  class session _raw_js = object
 
     (* not sure how to do this mutually recurisve issue...session
        needed in browser_window but web_contents needed in session *)
-    (* method on_will_download (f : (Events.event -> download_item)) *)
+    (* method on_will_download (f : (Events.event_emitter -> download_item)) *)
 
     (* method cookies_get :  *)
   end
@@ -85,21 +92,24 @@ end
 
 module Browser_window = struct
 
+  open Bindings_utils
+
   type window_t = Desktop | Dock | Toolbar | Splash | Notification
 
   (** OS X - specifies the style of window title bar. This option is
       supported on OS X 10.10 Yosemite and newer. *)
   type title_bar_t =
-    (** standard gray opaque Mac title bar. *)
+    |
       Default
+    (** standard gray opaque Mac title bar. *)
+    | Hidden
     (** results in a hidden title bar and a full size content window,
         yet the title bar still has the standard window controls ("traffic
         lights") in the top left. *)
-    | Hidden
+    | Hidden_inset
     (** results in a hidden title bar with an alternative look where
         the traffic light buttons are slightly more inset from the window
         edge. *)
-    | Hidden_inset
 
   let string_of_window = function
     | Desktop -> "desktop"
@@ -115,13 +125,18 @@ module Browser_window = struct
 
   (** Settings of web page's features *)
   type web_pref_t =
-    { (** Whether node integration is enabled *)
+    {
+
       node_integration : bool option;
+      (** Whether node integration is enabled *)
+
+      preload : string option;
       (** Specifies a script that will be loaded before other scripts
           run in the page. This script will always have access to node APIs no
           matter whether node integration is turned on for the page, and the
           path of preload script has to be absolute path.*)
-      preload : string option;
+
+      partition : string option;
       (** Sets the session used by the page. If partition starts with
           persist:, the page will use a persistent session available to
           all pages in the app with the same partition. if there is no
@@ -129,112 +144,130 @@ module Browser_window = struct
           assigning the same partition, multiple pages can share the same
           session. If the partition is None then default session of the
           app will be used. *)
-      partition : string option;
-      (** The default zoom factor of the page, 3.0 represents 300%. *)
+
       zoom_factor : float option;
+      (** The default zoom factor of the page, 3.0 represents 300%. *)
+
       javascript : bool option;
+
+
+      web_security : bool option;
       (** When setting false, it will disable the same-origin policy
           (Usually using testing websites by people), and set
           allow_displaying_insecure_content and
           allow_running_insecure_content to true if these two options are
           not set by user. *)
-      web_security : bool option;
+
+
+      allow_display_insecure_content : bool option;
       (** Allow an https page to display content like images from http
           URLs. *)
-      allow_display_insecure_content : bool option;
+
+      allow_running_insecure_content : bool option;
       (** Allow a https page to run JavaScript, CSS or plugins from
           http URLs. *)
-      allow_running_insecure_content : bool option;
+
       images : bool option;
       java : bool option;
       text_areas_are_resizable : bool option;
       webgl : bool option;
       web_audio : bool option;
-      (** Whether plugins should be enabled. *)
+
       plugins : bool option;
+      (** Whether plugins should be enabled. *)
+
       experimental_features : bool option;
       experimental_canvas_features : bool option;
       overlay_scrollbars : bool option;
       overlay_fullscreen_video : bool option;
       shared_worker : bool option;
+
+      direct_write : bool option;
       (** Whether the DirectWrite font rendering system on Windows is
           enabled. *)
-      direct_write : bool option;
+
+      page_visibility : bool option;
       (** Page would be forced to be always in visible or hidden state
           once set, instead of reflecting current window's
           visibility. Users can set it to true to prevent throttling of
           DOM timers. *)
-      page_visibility : bool option; }
+
+  }
 
   type browser_opts =
-    {(** Window's width. *)
+    {
+
+
+
       width: int;
-      (** Window's height. *)
+      (** Window's width. *)
       height : int;
-      (** Window's left offset from screen. *)
+      (** Window's height. *)
       x_offset : int option;
-      (** Window's top offset from screen *)
+      (** Window's left offset from screen. *)
       y_offset : int option;
+      (** Window's top offset from screen *)
+      use_content_size : bool option;
       (** The width and height would be used as web page's size, which
           means the actual window's size will include window frame's size
           and be slightly larger. *)
-      use_content_size : bool option;
-      (** Show window in the center of the screen. *)
       center : bool option;
-      (** Window's minimum width. *)
+      (** Show window in the center of the screen. *)
       min_width: int option;
-      (** Window's minimum height *)
+      (** Window's minimum width. *)
       min_height: int option;
-      (** Window's maximum width. *)
+      (** Window's minimum height *)
       max_width: int option;
-      (** Window's maximum height. *)
+      (** Window's maximum width. *)
       max_height : int option;
-      (** Whether window is resizable. *)
+      (** Window's maximum height. *)
       resizable : bool option;
-      (** Whether the window should always stay on top of other windows. *)
+      (** Whether window is resizable. *)
       always_on_top : bool option;
+      (** Whether the window should always stay on top of other windows. *)
+      fullscreen : bool option;
       (** Whether the window should show in fullscreen. When set to
           false the fullscreen button will be hidden or disabled on OS X. *)
-      fullscreen : bool option;
-      (** Whether to show the window in taskbar. *)
       skip_taskbar : bool option;
-      (** The kiosk mode. *)
+      (** Whether to show the window in taskbar. *)
       kiosk : bool option;
-      (** Default window title. *)
+      (** The kiosk mode. *)
       title : string option;
-      (** The Icon for the application *)
+      (** Default window title. *)
       icon : string option;
-      (** Whether window should be shown when created. *)
+      (** The Icon for the application *)
       show : bool option;
-      (** Specify false to create a Frameless Window. *)
+      (** Whether window should be shown when created. *)
       be_frameless : bool option;
+      (** Specify false to create a Frameless Window. *)
+      accept_first_mouse : bool option;
       (** Whether the web view accepts a single mouse-down event that
           simultaneously activates the window. *)
-      accept_first_mouse : bool option;
-      (**  Whether to hide cursor when typing. *)
       disable_auto_hide_cursor : bool option;
-      (** Auto hide the menu bar unless the Alt key is pressed. *)
+      (**  Whether to hide cursor when typing. *)
       auto_hide_menu_bar : bool option;
-      (** Enable the window to be resized larger than screen. *)
+      (** Auto hide the menu bar unless the Alt key is pressed. *)
       enable_larger_than_screen : bool option;
+      (** Enable the window to be resized larger than screen. *)
+      background_color : string option;
       (** Window's background color as Hexadecimal value, like #66CD00
           or #FFF. This is only implemented on Linux and Windows. *)
-      background_color : string option;
+      dark_theme : bool option;
       (** Forces using dark theme for the window, only works on some
           GTK+3 desktop environments. *)
-      dark_theme : bool option;
-      (** Makes the window transparent. *)
       transparent : bool option;
-      (**  Specifies the type of the window, this only works on Linux *)
+      (** Makes the window transparent. *)
       window_type : window_t option;
+      (**  Specifies the type of the window, this only works on Linux *)
+      standard_window : bool option;
       (** Uses the OS X's standard window instead of the textured
           window. *)
-      standard_window : bool option;
+      title_bar_style : title_bar_t option;
       (** OS X - specifies the style of window title bar. This option
           is supported on OS X 10.10 Yosemite and newer. *)
-      title_bar_style : title_bar_t option;
+      web_preferences : web_pref_t option;
       (** Settings of web page's features. *)
-      web_preferences : web_pref_t option; }
+    }
 
   type url_opts = { http_referrer : string;
                     user_agent : string;
@@ -270,6 +303,7 @@ module Browser_window = struct
        standard_window = s_w;
        title_bar_style = t_style;
        web_preferences = w_pref;
+       _
       } =
     let extract key = function None -> [] | Some g -> [(key, i g)] in
     let extract_str key = function None -> [] | Some g -> [(key, to_js_str g)] in
@@ -281,7 +315,7 @@ module Browser_window = struct
       | None -> []
       | Some t_bar -> [(key, to_js_str (string_of_title_bar t_bar))]
     in
-    let extract_web_prefs key = function
+    let extract_web_prefs _key = function
       | None -> []
       | Some {node_integration = n; preload = p;
               partition = par; zoom_factor = z;
@@ -359,11 +393,11 @@ module Browser_window = struct
       m raw_js "on" [|i (Js.string "did-finish-load"); i !@f|]
 
     method on_did_fail_load
-        (f : (Events.event -> int -> string -> string -> unit)) : unit =
+        (f : (Events.event_emitter -> int -> string -> string -> unit)) : unit =
       m raw_js "on" [|i (Js.string "did-fail-load"); i !@f|]
 
     method on_did_frame_finish_load
-        (f : (Events.event -> bool -> unit)) : unit =
+        (f : (Events.event_emitter -> bool -> unit)) : unit =
       m raw_js "on" [|i (Js.string "did-frame-finish-load"); i !@f|]
 
     (* method on_did_start_loading :  *)
@@ -589,10 +623,10 @@ module Browser_window = struct
       m raw_js "on" [|to_js_str "leave-html-full-screen"; i !@f|]
 
     (* This callback needs to be object wrapped correctly *)
-    method on_app_command (f : (Events.event -> string -> unit)) : unit =
+    method on_app_command (f : (Events.event_emitter -> string -> unit)) : unit =
       m raw_js "on" [|to_js_str "app-command"; i !@f|]
 
-    method on_page_title_updated (f : (Events.event -> unit)) : unit =
+    method on_page_title_updated (f : (Events.event_emitter -> unit)) : unit =
       m raw_js "on" [|to_js_str "page-title-updated"; i !@f|]
 
     method web_contents : web_contents =
