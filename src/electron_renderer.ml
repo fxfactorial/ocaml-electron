@@ -1,6 +1,7 @@
 (** These are modules intended for usage from the renderer process,
     aka your actual page *)
 
+open Js_of_ocaml
 open Nodejs
 
 module B = Electron_main.Browser_window
@@ -10,6 +11,8 @@ module Ipc_renderer = struct
 end
 
 module Remote = struct
+
+  open Bindings_utils
 
   type b_opts = Electron_main.Browser_window.browser_opts
 

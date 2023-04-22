@@ -1,0 +1,15 @@
+(library
+  (public_name electron)
+  (modules electron)
+  (libraries nodejs)
+  (preprocess (pps js_of_ocaml-ppx)))
+
+(library
+  (name electron_main)
+  (modules electron_main)
+  (libraries electron))
+
+(library
+  (name electron_renderer)
+  (modules electron_renderer)
+  (libraries electron electron_main))
