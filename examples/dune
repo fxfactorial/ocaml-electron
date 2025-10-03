@@ -1,0 +1,3 @@
+(executable
+  (name mvp)
+  (libraries electron electron_main nodejs))
